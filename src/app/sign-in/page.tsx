@@ -4,10 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Phone, Lock } from "lucide-react";
 
 const SignIn = () => {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // Email or Phone
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -15,9 +15,13 @@ const SignIn = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log(email, password);
 
-    
+    // Simulated API call
+    setTimeout(() => {
+      setIsLoading(false);
+      console.log("Identifier:", identifier);
+      console.log("Password:", password);
+    }, 1500);
   };
 
   return (
@@ -31,24 +35,30 @@ const SignIn = () => {
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Email or Phone Input */}
           <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium">
-              Email
+            <label htmlFor="identifier" className="block text-sm font-medium">
+              Email or Phone
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              {identifier.includes("@") ? (
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              ) : (
+                <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              )}
               <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
+                id="identifier"
+                type="text"
+                placeholder="you@example.com or +1234567890"
                 className="pl-10"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 required
               />
             </div>
           </div>
 
+          {/* Password Input */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label htmlFor="password" className="block text-sm font-medium">
@@ -86,6 +96,7 @@ const SignIn = () => {
             </div>
           </div>
 
+          {/* Submit Button */}
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Signing in..." : "Sign in"}
           </Button>
@@ -93,12 +104,12 @@ const SignIn = () => {
 
         <div className="text-center text-sm">
           <p className="text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            Don&apos;t have an account?
             <Link
               href="/sign-up"
               className="font-medium text-primary hover:underline"
             >
-              Sign up
+              Sign Up
             </Link>
           </p>
         </div>

@@ -1,5 +1,5 @@
 const MealProviderPage = () => {
-  return <div>This is meal provider page</div>;
+  return <div>This is meal provider dashboard page</div>;
 };
 
 export default MealProviderPage;
