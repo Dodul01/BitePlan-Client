@@ -115,14 +115,14 @@ const Nav = () => {
               className="text-sm font-medium transition-colors hover:text-primary"
               asChild
             >
-              <Link href="/login">Log in</Link>
+              <Link href="/sign-in">Sign In</Link>
             </Button>
             <Button
               variant="default"
               className="rounded-full text-sm px-5 py-2 transition-transform hover:scale-105"
               asChild
             >
-              <Link href="/signup">Sign Up</Link>
+              <Link href="/sign-up">Sign Up</Link>
             </Button>
           </div>
 
@@ -206,8 +206,11 @@ const Nav = () => {
                 className="w-full justify-center text-base"
                 asChild
               >
-                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                  Log in
+                <Link
+                  href="/sign-in"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Sign In
                 </Link>
               </Button>
               <Button
