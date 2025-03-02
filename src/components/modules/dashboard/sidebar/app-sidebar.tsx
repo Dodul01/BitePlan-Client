@@ -35,7 +35,7 @@ const data = {
       icon: Settings,
     },
     {
-      title: "Manage Profile",
+      title: "Profile",
       url: "/dashboard/profile/customar",
       icon: Settings,
     },

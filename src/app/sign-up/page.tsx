@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Mail, Lock, Phone } from "lucide-react";
 import Link from "next/link";
+import { registerUser } from "@/services/AuthServices";
 
 const SignUp = () => {
   const [userType, setUserType] = useState("customer");
@@ -28,7 +30,7 @@ const SignUp = () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -37,17 +39,26 @@ const SignUp = () => {
       setIsLoading(false);
       return;
     }
-
-    console.log({
-      userType,
-      fullName,
+    const userData = {
+      name: fullName,
       email,
       phone,
       password,
-      businessName,
-      cuisineSpecialties,
-      logo,
-    });
+      role: userType,
+      busisnessName: businessName,
+      cuisineSepcialties: cuisineSpecialties,
+      deliveryAddress,
+      // logo,
+    };
+
+    try {
+      const res = await registerUser(userData);
+      console.log(res);
+
+      setIsLoading(false);
+    } catch (err: any) {
+      console.log(err);
+    }
   };
 
   return (
@@ -68,8 +79,8 @@ const SignUp = () => {
             Customer
           </Button>
           <Button
-            variant={userType === "meal_provider" ? "default" : "outline"}
-            onClick={() => setUserType("meal_provider")}
+            variant={userType === "seller" ? "default" : "outline"}
+            onClick={() => setUserType("seller")}
           >
             Meal Provider
           </Button>
@@ -179,7 +190,7 @@ const SignUp = () => {
               htmlFor="confirmPassword"
               className="block text-sm font-medium"
             >
-              confirmPassword
+              Confirm Password
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -206,7 +217,7 @@ const SignUp = () => {
             </div>
           </div>
 
-          {userType === "meal_provider" && (
+          {userType === "seller" && (
             <>
               <div className="space-y-2">
                 <label

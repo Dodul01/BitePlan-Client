@@ -64,12 +64,6 @@ const SignIn = () => {
               <label htmlFor="password" className="block text-sm font-medium">
                 Password
               </label>
-              <button
-                type="button"
-                className="text-sm font-medium text-primary hover:underline"
-              >
-                Forgot password?
-              </button>
             </div>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
