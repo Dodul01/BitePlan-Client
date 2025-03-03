@@ -11,6 +11,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useUser } from "@/context/UserContext";
 
 interface NavItem {
   label: string;
@@ -37,6 +38,7 @@ const Nav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const user = useUser();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,20 +112,38 @@ const Nav = () => {
 
           {/* Auth  */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              className="text-sm font-medium transition-colors hover:text-primary"
-              asChild
-            >
-              <Link href="/sign-in">Sign In</Link>
-            </Button>
-            <Button
-              variant="default"
-              className="rounded-full text-sm px-5 py-2 transition-transform hover:scale-105"
-              asChild
-            >
-              <Link href="/sign-up">Sign Up</Link>
-            </Button>
+            {user.user ? (
+              <>
+                <Button
+                  variant="default"
+                  className="rounded-full text-sm px-5 py-2 transition-transform hover:scale-105"
+                  asChild
+                >
+                  {user.user.role === "customer" ? (
+                    <Link href="/dashboard/customar">Dashboard</Link>
+                  ) : (
+                    <Link href="/dashboard/provider">Dashboard</Link>
+                  )}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  className="text-sm font-medium transition-colors hover:text-primary"
+                  asChild
+                >
+                  <Link href="/sign-in">Sign In</Link>
+                </Button>
+                <Button
+                  variant="default"
+                  className="rounded-full text-sm px-5 py-2 transition-transform hover:scale-105"
+                  asChild
+                >
+                  <Link href="/sign-up">Sign Up</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu */}

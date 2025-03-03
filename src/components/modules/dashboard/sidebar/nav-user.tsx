@@ -16,10 +16,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useUser } from "@/context/UserContext";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  // TODO: get the user data
+  const user = useUser();
+
   const handleLogout = () => {
     //Todo: LogOut user
   };
@@ -36,13 +38,12 @@ export function NavUser() {
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage alt={"user image"} />
                 <AvatarFallback className="rounded-lg">
-                  {/* {user?.role} */}
-                  customar
+                  {user?.user?.name}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">Test user name</span>
-                <span className="truncate text-xs">test user email</span>
+                <span className="truncate font-semibold">{user?.user?.name}</span>
+                <span className="truncate text-xs">{user?.user?.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -58,13 +59,14 @@ export function NavUser() {
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage alt={""} />
                   <AvatarFallback className="rounded-lg">
-                    {/* {user?.role} */}
                     Customar
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Test user</span>
-                  <span className="truncate text-xs">Test email</span>
+                  <span className="truncate font-semibold">
+                    {user?.user?.name}
+                  </span>
+                  <span className="truncate text-xs">{user?.user?.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

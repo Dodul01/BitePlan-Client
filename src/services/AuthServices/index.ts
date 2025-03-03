@@ -47,7 +47,7 @@ export const signInUser = async (userData: any) => {
 };
 
 export const getCurrentUser = async () => {
-  const accessToken = (await cookies()).get("accessToken")?.value;
+  const accessToken = (await cookies()).get("token")?.value;
   let decodedData = null;
 
   if (accessToken) {
