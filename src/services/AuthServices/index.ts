@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { cookies } from "next/headers";
+import { jwtDecode } from "jwt-decode";
 
 export const registerUser = async (userData: any) => {
   try {
@@ -42,5 +43,17 @@ export const signInUser = async (userData: any) => {
     return result;
   } catch (error: any) {
     return Error(error);
+  }
+};
+
+export const getCurrentUser = async () => {
+  const accessToken = (await cookies()).get("accessToken")?.value;
+  let decodedData = null;
+
+  if (accessToken) {
+    decodedData = await jwtDecode(accessToken);
+    return decodedData;
+  } else {
+    return null;
   }
 };
