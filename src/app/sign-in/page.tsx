@@ -5,23 +5,39 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Mail, Phone, Lock } from "lucide-react";
+import { signInUser } from "@/services/AuthServices";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const SignIn = () => {
-  const [identifier, setIdentifier] = useState(""); // Email or Phone
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    const userData = {
+      identifier,
+      password,
+    };
 
-    // Simulated API call
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log("Identifier:", identifier);
-      console.log("Password:", password);
-    }, 1500);
+    try {
+      const res = await signInUser(userData);
+      setIsLoading(true);
+      if (res?.success) {
+        setIsLoading(false);
+        toast.success(res?.message);
+        router.push("/");
+      } else {
+        setIsLoading(false);
+        toast.error(res?.message);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error(err);
+    }
   };
 
   return (
@@ -49,7 +65,7 @@ const SignIn = () => {
               <Input
                 id="identifier"
                 type="text"
-                placeholder="you@example.com or +1234567890"
+                placeholder="you@example.com or 018000000000"
                 className="pl-10"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}

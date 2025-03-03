@@ -1,13 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Mail, Lock, Phone } from "lucide-react";
 import Link from "next/link";
 import { registerUser } from "@/services/AuthServices";
+import { toast } from "sonner";
+
+// You can replace these with process.env.NEXT_PUBLIC_CLOUD_NAME etc.
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_NAME || "dbwrot7po";
+const UPLOAD_PRESET =
+  process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "lkjadsflkjsdafkljasdf";
 
 const SignUp = () => {
   const [userType, setUserType] = useState("customer");
@@ -24,13 +28,36 @@ const SignUp = () => {
   const [logo, setLogo] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setLogo(e?.target?.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      setLogo(e.target.files[0]);
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSubmit = async (e: any) => {
+  // Uploads the image to Cloudinary and returns the secure URL
+  const handleCloudinaryUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) throw new Error("Image upload failed");
+      const data = await response.json();
+      return data.secure_url; // The secure URL of the uploaded image
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -39,6 +66,20 @@ const SignUp = () => {
       setIsLoading(false);
       return;
     }
+
+    let logoUrl = "";
+    // If meal provider and a file has been selected, upload it first
+    if (userType === "seller" && logo) {
+      try {
+        logoUrl = await handleCloudinaryUpload(logo);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        alert("Image upload failed, please try again.");
+        setIsLoading(false);
+        return;
+      }
+    }
+
     const userData = {
       name: fullName,
       email,
@@ -48,16 +89,25 @@ const SignUp = () => {
       busisnessName: businessName,
       cuisineSepcialties: cuisineSpecialties,
       deliveryAddress,
-      // logo,
+      // Only include the logo link if the user is a meal provider
+      logoImage: userType === "seller" ? logoUrl : undefined,
     };
 
     try {
       const res = await registerUser(userData);
-      console.log(res);
+      console.log("User registration response:", res);
 
-      setIsLoading(false);
+      if (res.success && res.result && res.result._id) {
+        toast.success("Sign Up Successfully.");
+      } else if (!res.success) {
+        toast.error(res.message);
+      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      console.log(err);
+      console.error("Registration error:", err);
+      toast.error("Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -271,7 +321,7 @@ const SignUp = () => {
 
           <div className="text-center text-sm">
             <p className="text-muted-foreground">
-              Already have and account?
+              Already have an account?{" "}
               <Link
                 href="/sign-in"
                 className="font-medium text-primary hover:underline"
