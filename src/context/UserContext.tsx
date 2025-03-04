@@ -1,11 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getCurrentUser } from "@/services/AuthServices";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 interface UserContextType {
   user: any;
@@ -22,6 +17,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleUser = async () => {
     const user = await getCurrentUser();
+
     setUser(user);
     setIsLoading(false);
   };

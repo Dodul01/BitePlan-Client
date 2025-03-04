@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Mail, Phone, Lock } from "lucide-react";
-import { signInUser } from "@/services/AuthServices";
+import { getCurrentUser, signInUser } from "@/services/AuthServices";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -25,11 +25,18 @@ const SignIn = () => {
 
     try {
       const res = await signInUser(userData);
-      setIsLoading(true);
+      const user = await getCurrentUser();
+
+
       if (res?.success) {
         setIsLoading(false);
         toast.success(res?.message);
-        router.push("/");
+
+        if (user.role === "customer") {
+          router.push("/find-meals");
+        } else {
+          router.push("/dashboard/provider");
+        }
       } else {
         setIsLoading(false);
         toast.error(res?.message);

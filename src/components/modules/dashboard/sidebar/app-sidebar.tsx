@@ -15,8 +15,9 @@ import {
 import Link from "next/link";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
-import { useUser } from "@/context/UserContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getCurrentUser } from "@/services/AuthServices";
+import { useEffect, useState } from "react";
 
 const data = {
   customarMenu: [
@@ -73,8 +74,16 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const user = useUser();
-  const role = user?.user?.role;
+  const [role, setRole] = useState("");
+
+  const getUser = async () => {
+    const user = await getCurrentUser();
+    setRole(user?.role);
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
 
   return (
     <Sidebar collapsible="icon" {...props}>
