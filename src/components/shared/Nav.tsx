@@ -29,13 +29,8 @@ interface User {
 const navItems: NavItem[] = [
   { label: "Home", href: "/" },
   {
-    label: "Meal Plans",
-    href: "/meal-plans",
-    subItems: [
-      { label: "Weekly Box", href: "/meal-plans/weekly" },
-      { label: "Family Plan", href: "/meal-plans/family" },
-      { label: "Individual Plan", href: "/meal-plans/individual" },
-    ],
+    label: "Find Meals",
+    href: "/find-meals",
   },
   { label: "How It Works", href: "/how-it-works" },
   { label: "About Us", href: "/about" },
@@ -45,7 +40,7 @@ const Nav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   // const router = useRouter();
@@ -60,13 +55,13 @@ const Nav = () => {
   }, []);
 
   const getuser = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     const user = await getCurrentUser();
-    if(user){
+    if (user) {
       setUser(user);
-      setIsLoading(false)
-    }else{
-      setIsLoading(false)
+      setIsLoading(false);
+    } else {
+      setIsLoading(false);
     }
     console.log(user, "from nav bar");
   };
