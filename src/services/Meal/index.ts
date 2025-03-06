@@ -5,8 +5,6 @@ import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 export const addMeal = async (payload: any): Promise<any> => {
-  console.log(payload); //getting data perfectly
-
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/create-meal`, {
       method: "POST",
@@ -20,5 +18,17 @@ export const addMeal = async (payload: any): Promise<any> => {
     return res.json();
   } catch (error: any) {
     return Error(error);
+  }
+};
+
+export const getMeals = async (): Promise<any> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/meals`, {
+      method: "GET",
+    });
+    revalidateTag("meals");
+    return res.json();
+  } catch (err: any) {
+    return Error(err);
   }
 };

@@ -3,7 +3,14 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Menu, X, ShoppingBag, ChevronRight } from "lucide-react";
+import {
+  ChevronDown,
+  Menu,
+  X,
+  ShoppingBag,
+  ChevronRight,
+  ShoppingCart,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Accordion,
@@ -11,10 +18,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-// import { useUser } from "@/context/UserContext";
 import { Skeleton } from "../ui/skeleton";
-// import { useRouter, usePathname } from "next/navigation";
 import { getCurrentUser } from "@/services/AuthServices";
+import { useCart } from "@/context/UserContext";
 
 interface NavItem {
   label: string;
@@ -43,8 +49,7 @@ const Nav = () => {
 
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  // const router = useRouter();
-  // const pathname = usePathname();
+  const { cart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,7 +68,6 @@ const Nav = () => {
     } else {
       setIsLoading(false);
     }
-    console.log(user, "from nav bar");
   };
 
   useEffect(() => {
@@ -135,17 +139,33 @@ const Nav = () => {
             {isLoading ? (
               <Skeleton className="w-32 h-8" />
             ) : user ? (
-              <Button
-                variant="default"
-                className="rounded-full text-sm px-5 py-2 transition-transform hover:scale-105"
-                asChild
-              >
-                {user?.role === "customer" ? (
-                  <Link href="/dashboard/customar">Dashboard</Link>
-                ) : (
-                  <Link href="/dashboard/provider">Dashboard</Link>
-                )}
-              </Button>
+              <div className="flex gap-3">
+                <Link
+                  className="cursor-pointer"
+                  href={"dashboard/customar/cart"}
+                >
+                  <div className="relative inline-block">
+                    <Button variant="outline" className="rounded-full cursor-pointer p-2">
+                      <ShoppingCart className="h-6 w-6" />
+                    </Button>
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white">
+                      {cart.length}
+                    </span>
+                  </div>
+                </Link>
+
+                <Button
+                  variant="default"
+                  className="rounded-full text-sm px-5 py-2 transition-transform hover:scale-105"
+                  asChild
+                >
+                  {user?.role === "customer" ? (
+                    <Link href="/dashboard/customar">Dashboard</Link>
+                  ) : (
+                    <Link href="/dashboard/provider">Dashboard</Link>
+                  )}
+                </Button>
+              </div>
             ) : (
               <>
                 <Button

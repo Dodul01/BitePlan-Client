@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Search,
   Filter,
@@ -21,100 +22,9 @@ import {
 } from "@/components/ui/accordion";
 import Image from "next/image";
 import SectionHeading from "@/components/shared/SectionHeading";
-
-// Sample meal data
-const MOCK_MEALS = [
-  {
-    id: "meal-1",
-    title: "Mediterranean Bowl",
-    description:
-      "Fresh vegetables, hummus, and grilled chicken over quinoa with tzatziki sauce.",
-    image:
-      "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhlYWx0aHklMjBtZWFsfGVufDB8fDB8fHww",
-    prepTime: "25 mins",
-    servings: 1,
-    tags: ["Mediterranean", "High Protein"],
-    dietaryInfo: ["Gluten-Free", "Dairy Optional"],
-    cuisine: "Mediterranean",
-    rating: 4.8,
-    provider: "Green Kitchen",
-  },
-  {
-    id: "meal-2",
-    title: "Vegan Curry Bowl",
-    description:
-      "Coconut curry with seasonal vegetables, tofu, and brown rice.",
-    image:
-      "https://images.unsplash.com/photo-1540914124281-342587941389?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y3VycnklMjBkaXNofGVufDB8fDB8fHww",
-    prepTime: "30 mins",
-    servings: 2,
-    tags: ["Curry", "Plant-Based"],
-    dietaryInfo: ["Vegan", "Gluten-Free"],
-    cuisine: "Indian",
-    rating: 4.7,
-    provider: "Plant Power",
-  },
-  {
-    id: "meal-3",
-    title: "Keto Steak Plate",
-    description:
-      "Grass-fed sirloin with cauliflower mash and roasted vegetables.",
-    image:
-      "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c3RlYWslMjBkaW5uZXJ8ZW58MHx8MHx8fDA%3D",
-    prepTime: "35 mins",
-    servings: 1,
-    tags: ["High Protein", "Low Carb"],
-    dietaryInfo: ["Keto", "Paleo"],
-    cuisine: "American",
-    rating: 4.9,
-    provider: "Keto Kitchen",
-  },
-  {
-    id: "meal-4",
-    title: "Superfood Salad",
-    description:
-      "Mixed greens, berries, nuts, and a citrus vinaigrette with optional grilled salmon.",
-    image:
-      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c2FsYWQlMjBtZWFsfGVufDB8fDB8fHww",
-    prepTime: "15 mins",
-    servings: 1,
-    tags: ["Salad", "Superfood"],
-    dietaryInfo: ["Vegetarian", "Pescatarian Optional"],
-    cuisine: "Fusion",
-    rating: 4.6,
-    provider: "Fresh Direct",
-  },
-  {
-    id: "meal-5",
-    title: "Mexican Bowl",
-    description:
-      "Black beans, rice, avocado, salsa, and grilled vegetables with optional chicken.",
-    image:
-      "https://images.unsplash.com/photo-1551248429-40975aa4de74?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fG1leGljYW4lMjBib3dsfGVufDB8fDB8fHww",
-    prepTime: "20 mins",
-    servings: 1,
-    tags: ["Mexican", "Bowl"],
-    dietaryInfo: ["Vegetarian", "Protein Options"],
-    cuisine: "Mexican",
-    rating: 4.5,
-    provider: "Spice Market",
-  },
-  {
-    id: "meal-6",
-    title: "Lemon Herb Chicken",
-    description:
-      "Herb-roasted chicken breast with seasonal vegetables and quinoa.",
-    image:
-      "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGNoaWNrZW4lMjBkaW5uZXJ8ZW58MHx8MHx8fDA%3D",
-    prepTime: "40 mins",
-    servings: 2,
-    tags: ["Chicken", "Family Meal"],
-    dietaryInfo: ["High Protein", "Dairy-Free"],
-    cuisine: "Mediterranean",
-    rating: 4.7,
-    provider: "Family Table",
-  },
-];
+import { getMeals } from "@/services/Meal";
+import { useCart } from "@/context/UserContext";
+import { toast } from "sonner";
 
 const DIETARY_OPTIONS = [
   "Vegetarian",
@@ -148,9 +58,12 @@ const PROVIDER_OPTIONS = [
 ];
 
 const FindMeals: React.FC = () => {
+  const [meals, setMeals] = useState<Array<any>>([]);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [filteredMeals, setFilteredMeals] = useState(MOCK_MEALS);
+  const [filteredMeals, setFilteredMeals] = useState<Array<any>>([]);
+  const { setCart } = useCart();
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,27 +85,27 @@ const FindMeals: React.FC = () => {
 
   // Apply search and filters to meals
   const applyFilters = (search: string, filters: string[]) => {
-    let results = MOCK_MEALS;
+    let results = meals;
 
-    // Apply search term
+    // Apply search term (using "name" from backend)
     if (search) {
       const searchLower = search.toLowerCase();
-      results = results.filter(
+      results = results?.filter(
         (meal) =>
-          meal.title.toLowerCase().includes(searchLower) ||
+          meal.name.toLowerCase().includes(searchLower) ||
           meal.description.toLowerCase().includes(searchLower) ||
           meal.cuisine.toLowerCase().includes(searchLower) ||
-          meal.provider.toLowerCase().includes(searchLower) ||
-          meal.dietaryInfo.some((tag) =>
+          meal.provider?.toLowerCase().includes(searchLower) ||
+          meal.dietaryInfo.some((tag: any) =>
             tag.toLowerCase().includes(searchLower)
           ) ||
-          meal.tags.some((tag) => tag.toLowerCase().includes(searchLower))
+          meal.tags.some((tag: any) => tag.toLowerCase().includes(searchLower))
       );
     }
 
     // Apply filters
     if (filters.length > 0) {
-      results = results.filter((meal) =>
+      results = results?.filter((meal) =>
         filters.some(
           (filter) =>
             meal.dietaryInfo.includes(filter) ||
@@ -209,8 +122,26 @@ const FindMeals: React.FC = () => {
   const clearFilters = () => {
     setSearchTerm("");
     setActiveFilters([]);
-    setFilteredMeals(MOCK_MEALS);
+    setFilteredMeals(meals);
   };
+
+  useEffect(() => {
+    const fetchMeals = async () => {
+      setLoading(true);
+      try {
+        const response = await getMeals();
+        // Assuming response.data contains an array of meals
+        setMeals(response.data);
+        setFilteredMeals(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching meals:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchMeals();
+  }, []);
 
   return (
     <div>
@@ -245,9 +176,9 @@ const FindMeals: React.FC = () => {
             >
               <Filter className="h-4 w-4" />
               Filters
-              {activeFilters.length > 0 && (
+              {activeFilters?.length > 0 && (
                 <Badge variant="secondary" className="ml-1">
-                  {activeFilters.length}
+                  {activeFilters?.length}
                 </Badge>
               )}
             </Button>
@@ -405,23 +336,24 @@ const FindMeals: React.FC = () => {
             <TabsTrigger value="new">New Arrivals</TabsTrigger>
           </TabsList>
 
+          {/*TODO: Need to add a loading spinner here  */}
           <TabsContent value="all" className="mt-6">
-            {filteredMeals.length > 0 ? (
+            {loading === true || filteredMeals?.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredMeals.map((meal) => (
                   <div
-                    key={meal.id}
+                    key={meal._id}
                     className="border rounded-lg overflow-hidden shadow"
                   >
                     <Image
                       height={400}
                       width={400}
                       src={meal.image}
-                      alt={meal.title}
+                      alt={meal.name}
                       className="w-full h-48 object-cover"
                     />
                     <div className="p-4">
-                      <h3 className="text-xl font-bold">{meal.title}</h3>
+                      <h3 className="text-xl font-bold">{meal.name}</h3>
                       <p className="text-sm text-gray-600">
                         {meal.description}
                       </p>
@@ -431,15 +363,30 @@ const FindMeals: React.FC = () => {
                           Servings: {meal.servings}
                         </span>
                       </div>
-                      <div className="mt-2 flex gap-2 flex-wrap">
-                        {meal.tags.map((tag, index) => (
-                          <Badge variant={"outline"} key={index}>
-                            {tag}
-                          </Badge>
-                        ))}
+                      <div className="mt-2 flex justify-between">
+                        <div className="flex gap-2 flex-wrap">
+                          {meal.tags.map((tag: any, index: number) => (
+                            <Badge variant={"outline"} key={index}>
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                        <h3 className="text-lg font-semibold text-green-600">
+                          ${meal.price}
+                        </h3>
                       </div>
                       <div className="mt-2">
-                        <Button>Order Now</Button>
+                        <Button
+                          onClick={() => {
+                            setCart((previousMeal: any) => [
+                              ...previousMeal,
+                              meal,
+                            ]);
+                            toast.success("Food added to your cart.");
+                          }}
+                        >
+                          Order Now
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -460,71 +407,107 @@ const FindMeals: React.FC = () => {
 
           <TabsContent value="popular" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {MOCK_MEALS.filter((meal) => meal.rating > 4.7).map((meal) => (
-                <div
-                  key={meal.id}
-                  className="border rounded-lg overflow-hidden shadow"
-                >
-                  <Image
-                    height={400}
-                    width={400}
-                    src={meal.image}
-                    alt={meal.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-4">
-                    <h3 className="text-xl font-bold">{meal.title}</h3>
-                    <p className="text-sm text-gray-600">{meal.description}</p>
-                    <div className="flex justify-between mt-4">
-                      <span className="text-sm">Prep: {meal.prepTime}</span>
-                      <span className="text-sm">Servings: {meal.servings}</span>
-                    </div>
-                    <div className="mt-2 flex gap-2 flex-wrap">
-                      {meal.tags.map((tag, index) => (
-                        <Badge variant={"outline"} key={index}>
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="mt-2">
-                      <Button>Order Now</Button>
+              {meals
+                .filter((meal: any) => meal.rating > 4.7)
+                .map((meal: any) => (
+                  <div
+                    key={meal._id}
+                    className="border rounded-lg overflow-hidden shadow"
+                  >
+                    <Image
+                      height={400}
+                      width={400}
+                      src={meal.image}
+                      alt={meal.name}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="p-4">
+                      <h3 className="text-xl font-bold">{meal.name}</h3>
+                      <p className="text-sm text-gray-600">
+                        {meal.description}
+                      </p>
+                      <div className="flex justify-between mt-4">
+                        <span className="text-sm">Prep: {meal.prepTime}</span>
+                        <span className="text-sm">
+                          Servings: {meal.servings}
+                        </span>
+                      </div>
+                      <div className="mt-2 flex justify-between">
+                        <div className="flex gap-2 flex-wrap">
+                          {meal.tags.map((tag: any, index: number) => (
+                            <Badge variant={"outline"} key={index}>
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                        <h3 className="text-lg font-semibold text-green-600">
+                          ${meal.price}
+                        </h3>
+                      </div>
+                      <div className="mt-2">
+                        <Button
+                          onClick={() => {
+                            setCart((previousMeal: any) => [
+                              ...previousMeal,
+                              meal,
+                            ]);
+                            toast.success("Food added to your cart.");
+                          }}
+                        >
+                          Order Now
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </TabsContent>
 
           <TabsContent value="new" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {MOCK_MEALS.slice(0, 3).map((meal) => (
+              {meals.slice(0, 3).map((meal: any) => (
                 <div
-                  key={meal.id}
+                  key={meal._id}
                   className="border rounded-lg overflow-hidden shadow"
                 >
                   <Image
                     height={400}
                     width={400}
                     src={meal.image}
-                    alt={meal.title}
+                    alt={meal.name}
                     className="w-full h-48 object-cover"
                   />
                   <div className="p-4">
-                    <h3 className="text-xl font-bold">{meal.title}</h3>
+                    <h3 className="text-xl font-bold">{meal.name}</h3>
                     <p className="text-sm text-gray-600">{meal.description}</p>
                     <div className="flex justify-between mt-4">
                       <span className="text-sm">Prep: {meal.prepTime}</span>
                       <span className="text-sm">Servings: {meal.servings}</span>
                     </div>
-                    <div className="mt-2 flex gap-2 flex-wrap">
-                      {meal.tags.map((tag, index) => (
-                        <Badge variant={"outline"} key={index}>
-                          {tag}
-                        </Badge>
-                      ))}
+                    <div className="mt-2 flex justify-between">
+                      <div className="flex gap-2 flex-wrap">
+                        {meal.tags.map((tag: any, index: number) => (
+                          <Badge variant={"outline"} key={index}>
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                      <h3 className="text-lg font-semibold text-green-600">
+                        ${meal.price}
+                      </h3>
                     </div>
                     <div className="mt-2">
-                      <Button>Order Now</Button>
+                      <Button
+                        onClick={() => {
+                          setCart((previousMeal: any) => [
+                            ...previousMeal,
+                            meal,
+                          ]);
+                          toast.success("Food added to your cart.");
+                        }}
+                      >
+                        Order Now
+                      </Button>
                     </div>
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, Settings, SquareTerminal } from "lucide-react";
+import { BoltIcon, Bot, ListOrdered, Settings, ShoppingCart, SquareTerminal } from "lucide-react";
 
 import {
   Sidebar,
@@ -28,19 +28,24 @@ const data = {
       isActive: true,
     },
     {
+      title: "Food Cart",
+      url: "/dashboard/customar/cart",
+      icon: ShoppingCart,
+    },
+    {
       title: "Track Orders",
       url: "/dashboard/customar/track-order",
-      icon: Bot,
+      icon: ListOrdered,
     },
     {
       title: "Manage Preferences",
       url: "/dashboard/customar/manage-preferences",
-      icon: Settings,
+      icon: BoltIcon,
     },
     {
       title: "Profile",
       url: "/dashboard/profile/customar",
-      icon: Settings,
+      icon: BoltIcon,
     },
   ],
   mealProviderMenu: [
