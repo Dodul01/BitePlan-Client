@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/UserContext";
 import { getCurrentUser } from "@/services/AuthServices";
+import { orderMeal } from "@/services/Order";
 import { TrashIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -21,10 +22,18 @@ const CartPage = () => {
     (sum: number, item: any) => sum + Number(item.price),
     0
   );
+
+  const handleCheckout = async () => {
+    const orderedItemId = cart.map((i: any) => i._id);
+    const res = await orderMeal(orderedItemId);
+    console.log(res);
+
+    // console.log(orderedItemId);
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       const user = await getCurrentUser();
-      //   console.log(user);
       setCurrentUser(user);
     };
     fetchUser();
@@ -99,7 +108,10 @@ const CartPage = () => {
             </div>
           </div>
           <div>
-            <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+            <Button
+              onClick={() => handleCheckout()}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+            >
               Check Out
             </Button>
           </div>
