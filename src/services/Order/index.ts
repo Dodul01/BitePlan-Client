@@ -6,17 +6,21 @@ import { cookies } from "next/headers";
 
 export const orderMeal = async (payload: any) => {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+    
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/order-meal`, {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ orderedItemIds: payload }),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${await cookies()}`,
+        Authorization: token ? `Bearer ${token}` : "",
       },
     });
+
     revalidateTag("meals");
     return res.json();
   } catch (error: any) {
-    return Error(error);
+    return new Error(error);
   }
 };

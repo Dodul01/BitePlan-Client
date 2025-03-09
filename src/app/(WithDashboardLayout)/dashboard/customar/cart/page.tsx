@@ -10,6 +10,8 @@ import { getCurrentUser } from "@/services/AuthServices";
 import { orderMeal } from "@/services/Order";
 import { TrashIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 interface User {
   deliveryAddress?: string;
@@ -18,6 +20,8 @@ interface User {
 const CartPage = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const { cart } = useCart();
+  const router = useRouter();
+
   const totalPrice = cart.reduce(
     (sum: number, item: any) => sum + Number(item.price),
     0
@@ -25,9 +29,9 @@ const CartPage = () => {
 
   const handleCheckout = async () => {
     const orderedItemId = cart.map((i: any) => i._id);
-    const res = await orderMeal(orderedItemId);
-    console.log(res);
-
+    // const res = await orderMeal(orderedItemId);
+    // console.log(res);
+    // router.push('/checkout')
     // console.log(orderedItemId);
   };
 
@@ -107,14 +111,14 @@ const CartPage = () => {
               </span>
             </div>
           </div>
-          <div>
+          <Link href={'/dashboard/customar/checkout'}>
             <Button
-              onClick={() => handleCheckout()}
+              // onClick={() => handleCheckout()}
               className="w-full bg-green-600 hover:bg-green-700 text-white"
             >
               Check Out
             </Button>
-          </div>
+          </Link>
         </div>
       </div>
     </div>
