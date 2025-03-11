@@ -11,7 +11,7 @@ export const orderMeal = async (payload: any) => {
     
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/order-meal`, {
       method: "POST",
-      body: JSON.stringify({ orderedItemIds: payload }),
+      body: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
         Authorization: token ? `Bearer ${token}` : "",

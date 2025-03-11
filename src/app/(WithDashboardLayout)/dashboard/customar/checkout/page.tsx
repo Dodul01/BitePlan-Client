@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -14,10 +15,9 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CreditCard, ShoppingCart, Check } from "lucide-react";
 import { toast } from "sonner";
-import { useCart } from "@/context/UserContext";
+import { useCart, useUser } from "@/context/UserContext";
 import SectionHeading from "@/components/shared/SectionHeading";
 
-// Stripe imports
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -25,13 +25,19 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { orderMeal } from "@/services/Order";
+import { getCurrentUser } from "@/services/AuthServices";
 
-const stripePromise = loadStripe("YOUR_STRIPE_PUBLIC_KEY");
+const stripePromise = loadStripe(
+  "pk_test_51PcPm62MP0L90YjvNNkd1UGVrq9nu0QWdLfYT4pIF7xAJcfykwMCNeTiZVhSswnCNFHdp2WbqZJweJcxk9IRxARE00OCcRlb8N"
+);
 
 const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isUserLoading, setIsUserLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const { cart: cartItems } = useCart();
 
@@ -64,29 +70,54 @@ const CheckoutForm = () => {
         return;
       }
 
-      // Send paymentMethod.id to backend for further processing
-      const response = await fetch("/api/payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: total * 100, // Convert to cents
-          paymentMethodId: paymentMethod.id,
-        }),
-      });
+      console.log(paymentMethod);
 
-      const paymentResult = await response.json();
-      if (paymentResult.success) {
-        setPaymentSuccess(true);
-        toast.success("Payment successful!");
-      } else {
-        toast.error("Payment failed");
-      }
+      // Extract only order IDs
+      const orderIds = cartItems.map((item: any) => item._id); // Ensure it's an array
+
+      // Send order IDs and paymentMethod directly (no extra wrapper)
+      const orderData = {
+        orderedItemIds: orderIds, // Send this directly as an array
+        user: user,
+        paymentMethod: {
+          id: paymentMethod.id,
+          type: paymentMethod.type,
+          card: paymentMethod.card || undefined, // Optional
+        },
+      };
+
+      const result = await orderMeal(orderData); // Send properly formatted data
+
+      console.log(result);
+
+      // if (result?.status === 200) {
+      //   toast.success("Order placed successfully.");
+      //   window.location.assign("/order-tracking");
+      // } else {
+      //   toast.error("Order failed. Please try again.");
+      // }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err: any) {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }
   };
+
+  const getuser = async () => {
+    setIsUserLoading(true);
+    const user = await getCurrentUser();
+    if (user) {
+      setUser(user);
+      setIsUserLoading(false);
+    } else {
+      setIsUserLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getuser();
+  }, []);
 
   if (paymentSuccess) {
     return (
