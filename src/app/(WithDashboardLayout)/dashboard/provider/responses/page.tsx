@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { PackageCheck, Truck, Clock } from "lucide-react";
+import { PackageCheck, Truck, Clock, CircleX } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -15,13 +16,14 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import SectionHeading from "@/components/shared/SectionHeading";
-import { getOrderedMeal } from "@/services/Order";
+import { getOrderedMeal, updateOrder } from "@/services/Order";
 import Image from "next/image";
 
 const statusIcons = {
   processing: <Clock className="h-6 w-6 text-yellow-500" />,
   shipped: <Truck className="h-6 w-6 text-blue-500" />,
   delivered: <PackageCheck className="h-6 w-6 text-green-500" />,
+  cancelled: <CircleX className="h-6 w-6 text-red-500" />,
 };
 
 const OrderManagement = () => {
@@ -39,13 +41,32 @@ const OrderManagement = () => {
     );
   };
 
-  const handleStatusChange = (orderId: string, newStatus: string) => {
-    const updatedOrders = orders.map((order) =>
-      order._id === orderId ? { ...order, status: newStatus } : order
-    );
-    setOrders(updatedOrders);
-    setFilteredOrders(updatedOrders);
-    toast.success("Order status updated");
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    setIsLoading(true);
+    const updatedStatus = {
+      status: newStatus,
+    };
+    const result = await updateOrder({ orderId, updatedStatus });
+
+    if (result.status) {
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+
+      setFilteredOrders((prevFiltered) =>
+        prevFiltered.map((order) =>
+          order._id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+
+      setIsLoading(false);
+      toast.success(`Order ${newStatus} successfully.`);
+    } else {
+      setIsLoading(false);
+      toast.error("Something went wrong.");
+    }
   };
 
   const getOrders = useCallback(async () => {
@@ -75,7 +96,7 @@ const OrderManagement = () => {
           decorative={true}
         />
       </div>
-
+      {/* Tab */}
       <Card className="bg-white/50 backdrop-blur-sm">
         <CardContent className="pt-6">
           <Tabs
@@ -83,11 +104,12 @@ const OrderManagement = () => {
             value={activeTab}
             onValueChange={handleTabChange}
           >
-            <TabsList className="grid grid-cols-4 w-full">
+            <TabsList className="grid grid-cols-5 w-full">
               <TabsTrigger value="all">All Orders</TabsTrigger>
               <TabsTrigger value="processing">Processing</TabsTrigger>
               <TabsTrigger value="shipped">Shipped</TabsTrigger>
               <TabsTrigger value="delivered">Delivered</TabsTrigger>
+              <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
             </TabsList>
           </Tabs>
         </CardContent>
@@ -152,6 +174,7 @@ const OrderManagement = () => {
                       <SelectItem value="processing">Processing</SelectItem>
                       <SelectItem value="shipped">Shipped</SelectItem>
                       <SelectItem value="delivered">Delivered</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -28,7 +28,6 @@ export const orderMeal = async (payload: any) => {
 
 export const getOrderedMeal = async () => {
   try {
-    // Get the current user
     const user = await getCurrentUser();
 
     if (!user || !user.email) {
@@ -36,7 +35,7 @@ export const getOrderedMeal = async () => {
     }
 
     const token = (await cookies()).get("token")?.value;
-    // fetch the orders 
+
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_API}/get-orders/${user.email}`,
       {
@@ -49,8 +48,37 @@ export const getOrderedMeal = async () => {
     );
 
     const data = await res.json();
-  
     return data;
+  } catch (error: any) {
+    console.error("Error fatching ordered meals:", error);
+    return new Error(error);
+  }
+};
+
+export const updateOrder = async (payload: any) => {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user || !user.email) {
+      throw new Error("User not authenticated!");
+    }
+
+    const token = (await cookies()).get("token")?.value;
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/order-status/${payload.orderId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(payload.updatedStatus),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+    );
+
+    const data = await res.json();
+    return data
   } catch (error: any) {
     console.error("Error fatching ordered meals:", error);
     return new Error(error);

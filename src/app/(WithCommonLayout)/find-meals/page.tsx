@@ -71,7 +71,8 @@ const FindMeals: React.FC = () => {
     setSearchTerm(value);
     applyFilters(value, activeFilters);
   };
-
+  console.log(meals);
+  
   // Toggle filter option
   const toggleFilter = (filter: string) => {
     setActiveFilters((prev) => {

@@ -1,6 +1,13 @@
 "use client";
 
-import { BoltIcon, Bot, ListOrdered, Settings, ShoppingCart, SquareTerminal } from "lucide-react";
+import {
+  BoltIcon,
+  Bot,
+  ListOrdered,
+  Settings,
+  ShoppingCart,
+  SquareTerminal,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -57,12 +64,12 @@ const data = {
     },
     {
       title: "View Orders",
-      url: "/dashboard/provider/all-orders",
+      url: "/dashboard/provider/view-orders",
       icon: Bot,
     },
     {
       title: "Respond to Orders",
-      url: "/dashboard/provider/response",
+      url: "/dashboard/provider/responses",
       icon: Settings,
     },
     {
