@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { User, Mail, Phone, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,18 +14,43 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { getUserFromDB, updateUserProfile } from "@/services/User";
+import { toast } from "sonner";
 
 const CustomarProfilePage = () => {
   const router = useRouter();
-
   const [formData, setFormData] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    address: "123 Main Street, Apt 4B\nNew York, NY 10001",
+    name: "",
+    email: "",
+    phone: "",
+    deliveryAddress: "",
   });
-
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setIsFetching(true);
+        const response = await getUserFromDB();
+
+        if (response?.success && response.result) {
+          setFormData({
+            name: response.result.name || "",
+            email: response.result.email || "",
+            phone: response.result.phone || "",
+            deliveryAddress: response.result.deliveryAddress || "",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -37,10 +62,24 @@ const CustomarProfilePage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    const result = await updateUserProfile(formData);
+
+    if (result.success) {
+      toast.success(result.message);
+      setIsLoading(false);
+    } else {
+      toast.error("Something went wrong!");
+      setIsLoading(false);
+    }
   };
+
+  if (isFetching) {
+    return <p className="text-center text-lg font-medium">Loading...</p>;
+  }
 
   return (
     <div>
@@ -131,9 +170,9 @@ const CustomarProfilePage = () => {
                   <div className="relative">
                     <Home className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Textarea
-                      id="address"
-                      name="address"
-                      value={formData.address}
+                      id="deliveryAddress"
+                      name="deliveryAddress"
+                      value={formData.deliveryAddress}
                       onChange={handleChange}
                       className="pl-10 min-h-[100px]"
                       required

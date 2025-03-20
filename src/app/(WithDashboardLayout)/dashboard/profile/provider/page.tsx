@@ -6,8 +6,9 @@ import { User, Mail, Phone, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { getUserFromDB } from "@/services/User";
+import { getUserFromDB, updateUserProfile } from "@/services/User";
 import SectionHeading from "@/components/shared/SectionHeading";
+import { toast } from "sonner";
 
 const ProviderProfilePage = () => {
   const router = useRouter();
@@ -18,14 +19,13 @@ const ProviderProfilePage = () => {
     cuisineSepcialties: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(true); // New state for fetching
+  const [isFetching, setIsFetching] = useState(true);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         setIsFetching(true);
         const response = await getUserFromDB();
-        console.log(response);
 
         if (response?.success && response.result) {
           setFormData({
@@ -55,12 +55,18 @@ const ProviderProfilePage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log(formData);
+    const result = await updateUserProfile(formData);
 
-    setTimeout(() => setIsLoading(false), 2000);
+    if (result.success) {
+      toast.success(result.message);
+      setIsLoading(false)
+    } else {
+      toast.error("Something went wrong!");
+      setIsLoading(false)
+    }
   };
 
   if (isFetching) {

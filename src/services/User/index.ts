@@ -30,3 +30,33 @@ export const getUserFromDB = async () => {
     return new Error(error);
   }
 };
+
+export const updateUserProfile = async (payload: any) => {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user || !user.email) {
+      throw new Error("User not authenticated!");
+    }
+
+    const token = (await cookies()).get("token")?.value;
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/users/update-user/${payload.email}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(payload),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+    );
+    const data = await res.json();
+
+    return data;
+  } catch (error: any) {
+    console.error("Error fatching ordered meals:", error);
+    return new Error(error);
+  }
+};
