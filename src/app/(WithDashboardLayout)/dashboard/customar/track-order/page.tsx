@@ -11,6 +11,7 @@ import {
   Clock,
   Search,
   ChevronRight,
+  CircleX,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ const statusIcons = {
   processing: <Clock className="h-6 w-6 text-yellow-500" />, 
   shipped: <Truck className="h-6 w-6 text-blue-500" />, 
   delivered: <PackageCheck className="h-6 w-6 text-green-500" />, 
+  cancelled: <CircleX className="h-6 w-6 text-red-500"/>
 };
 
 const OrderTracking = () => {
@@ -34,6 +36,7 @@ const OrderTracking = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
+  const [status, setStatus] = useState<'processing' | 'shipped' | 'delivered' | 'cancelled'>('processing')
 
   const getOrders = useCallback(async () => {
     try {
@@ -41,6 +44,9 @@ const OrderTracking = () => {
       const response = await getOrderedMeal();
       setOrders(response.data.allOrders[0].orderedItemIds);
       setFilteredOrders(response.data.allOrders[0].orderedItemIds);
+      setStatus(response.data.allOrders[0].status);
+      console.log(response.data.allOrders);
+      
     } catch (error) {
       console.error("Failed to fetch orders:", error);
     } finally {
@@ -100,8 +106,8 @@ const OrderTracking = () => {
                   <div className="bg-muted/30 p-4 flex justify-between items-center">
                     <div>
                       <div className="flex items-center space-x-2">
-                        {statusIcons["processing"]}
-                        <span className="font-medium">Processing</span>
+                        {statusIcons[`${status}`]}
+                        <span className="font-medium">{status}</span>
                       </div>
                       <p className="text-sm text-muted-foreground">Order {order._id}</p>
                     </div>

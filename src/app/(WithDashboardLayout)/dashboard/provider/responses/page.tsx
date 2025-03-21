@@ -76,6 +76,8 @@ const OrderManagement = () => {
       const orderData = response?.data?.allOrders || [];
       setOrders(orderData);
       setFilteredOrders(orderData);
+      console.log(orderData);
+      
     } catch (error) {
       console.error("Failed to fetch orders:", error);
     } finally {
