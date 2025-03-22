@@ -1,6 +1,7 @@
-"use client"
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -13,32 +14,50 @@ import {
 } from "@/components/ui/collapsible";
 import { toast } from "sonner";
 import SectionHeading from "@/components/shared/SectionHeading";
+import { getCurrentUser } from "@/services/AuthServices";
+import { createMealPreference, getMealPreference } from "@/services/Preference";
+const dietaryTypesArray = [
+  "vegetarian",
+  "vegan",
+  "pescatarian",
+  "keto",
+  "paleo",
+  "gluten-free",
+];
+const allergiesArray = [
+  "nuts",
+  "dairy",
+  "eggs",
+  "shellfish",
+  "soy",
+  "wheat",
+  "fish",
+];
+const cuisinesArray = [
+  "thai",
+  "indian",
+  "chinese",
+  "french",
+  "korean",
+  "vietnamese",
+  "greek",
+  "mediterranean",
+];
+const spiceLevelArray = ["mild", "medium-mild", "medium", "medium-hot", "hot"];
+const portionSizeArray = ["small", "regular", "large"];
 
-const ManagePreferencesAlternative = () => {
+const ManagePeferencs = () => {
   const [isLoading, setIsLoading] = useState(false);
-
-  // Dietary restrictions state
-  const [allergies, setAllergies] = useState<string[]>(["nuts", "shellfish"]);
-  const [dietaryTypes, setDietaryTypes] = useState<string[]>(["vegetarian"]);
-
-  // Cuisine preferences state
-  const [cuisines, setCuisines] = useState<string[]>([
-    "italian",
-    "mexican",
-    "japanese",
-  ]);
+  const [allergies, setAllergies] = useState<string[]>([]);
+  const [dietaryTypes, setDietaryTypes] = useState<string[]>([]);
+  const [cuisines, setCuisines] = useState<string[]>([]);
   const [spiceLevel, setSpiceLevel] = useState("medium");
-
-  // Portion size state
   const [portionSize, setPortionSize] = useState("regular");
-
-  // Collapsible sections state
   const [openSections, setOpenSections] = useState({
     dietary: true,
     cuisines: true,
     portions: true,
   });
-
   const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections({
       ...openSections,
@@ -46,15 +65,57 @@ const ManagePreferencesAlternative = () => {
     });
   };
 
-  const handleSavePreferences = () => {
-    setIsLoading(true);
+  /*
+  TODO: update preference 
 
-    // Simulate saving preferences to the backend
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success("Your meal preferences have been updated successfully.");
-    }, 1000);
+  */
+  const fetchPreferences = async () => {
+    try {
+      const res = await getMealPreference();
+      console.log(res.result);
+      if (res.result === null) return;
+      if (res.status === false) throw new Error("Failed to fetch preferences");
+      setAllergies(res.result.allergies || []);
+      setDietaryTypes(res.result.dietaryTypes || []);
+      setCuisines(res.result.cuisines || []);
+      setSpiceLevel(res.result.spiceLevel || "medium");
+      setPortionSize(res.result.portionSize || "regular");
+    } catch (error) {
+      toast.error("Error fetching preferences");
+    }
   };
+
+  const handleSavePreferences = async () => {
+    try {
+      setIsLoading(true);
+      const user = await getCurrentUser();
+      if (!user || !user.email) throw new Error("User not authenticated!");
+      const payload = {
+        allergies,
+        dietaryTypes,
+        cuisines,
+        spiceLevel,
+        portionSize,
+        email: user.email,
+      };
+      const result = await createMealPreference(payload);
+
+      if (result.success) {
+        toast.success("Preferences updated successfully");
+        await fetchPreferences();
+      } else {
+        toast.error("Failed to save preferences");
+      }
+    } catch (error) {
+      toast.error("An error occurred while saving preferences.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPreferences();
+  }, []);
 
   const removeCuisine = (cuisine: string) => {
     setCuisines(cuisines.filter((c) => c !== cuisine));
@@ -78,7 +139,7 @@ const ManagePreferencesAlternative = () => {
 
   return (
     <div>
-      <div className="container max-w-4xl py-12 px-4 sm:px-6 lg:px-8">
+      <div className="container px-4 sm:px-6 lg:px-8">
         <SectionHeading
           title="Manage Your Meal Preferences"
           subtitle="Customize your meal experience with your dietary needs and taste preferences"
@@ -111,14 +172,7 @@ const ManagePreferencesAlternative = () => {
                     <div>
                       <h3 className="font-medium mb-3">Diet Type</h3>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {[
-                          "vegetarian",
-                          "vegan",
-                          "pescatarian",
-                          "keto",
-                          "paleo",
-                          "gluten-free",
-                        ].map((diet) => (
+                        {dietaryTypesArray.map((diet) => (
                           <div
                             key={diet}
                             className={`flex items-center space-x-2 rounded-md border p-3 cursor-pointer ${
@@ -158,15 +212,7 @@ const ManagePreferencesAlternative = () => {
                         Select any ingredients you need to avoid
                       </p>
                       <div className="flex flex-wrap gap-2">
-                        {[
-                          "nuts",
-                          "dairy",
-                          "eggs",
-                          "shellfish",
-                          "soy",
-                          "wheat",
-                          "fish",
-                        ].map((allergy) => (
+                        {allergiesArray.map((allergy) => (
                           <Badge
                             key={allergy}
                             variant={
@@ -246,16 +292,7 @@ const ManagePreferencesAlternative = () => {
                       </div>
 
                       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-4">
-                        {[
-                          "thai",
-                          "indian",
-                          "chinese",
-                          "french",
-                          "korean",
-                          "vietnamese",
-                          "greek",
-                          "mediterranean",
-                        ].map((cuisine) => (
+                        {cuisinesArray.map((cuisine) => (
                           <Badge
                             key={cuisine}
                             variant={
@@ -285,13 +322,7 @@ const ManagePreferencesAlternative = () => {
                     <div>
                       <h3 className="font-medium mb-3">Spice Preference</h3>
                       <div className="grid grid-cols-5 gap-3">
-                        {[
-                          "mild",
-                          "medium-mild",
-                          "medium",
-                          "medium-hot",
-                          "hot",
-                        ].map((level) => (
+                        {spiceLevelArray.map((level) => (
                           <div
                             key={level}
                             className={`text-center p-2 border rounded-md cursor-pointer ${
@@ -349,7 +380,7 @@ const ManagePreferencesAlternative = () => {
                         Preferred Portion Size
                       </h3>
                       <div className="grid grid-cols-3 gap-3">
-                        {["small", "regular", "large"].map((size) => (
+                        {portionSizeArray.map((size) => (
                           <div
                             key={size}
                             className={`flex flex-col items-center p-4 border rounded-lg cursor-pointer ${
@@ -411,4 +442,4 @@ const ManagePreferencesAlternative = () => {
   );
 };
 
-export default ManagePreferencesAlternative;
+export default ManagePeferencs;
