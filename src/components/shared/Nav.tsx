@@ -140,19 +140,25 @@ const Nav = () => {
               <Skeleton className="w-32 h-8" />
             ) : user ? (
               <div className="flex gap-3">
-                <Link
-                  className="cursor-pointer"
-                  href={"dashboard/customar/cart"}
-                >
-                  <div className="relative inline-block">
-                    <Button variant="outline" className="rounded-full cursor-pointer p-2">
-                      <ShoppingCart className="h-6 w-6" />
-                    </Button>
-                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white">
-                      {cart.length}
-                    </span>
-                  </div>
-                </Link>
+                {/* cart */}
+                {user.role === "customer" && (
+                  <Link
+                    className="cursor-pointer"
+                    href={"dashboard/customar/cart"}
+                  >
+                    <div className="relative inline-block">
+                      <Button
+                        variant="outline"
+                        className="rounded-full cursor-pointer p-2"
+                      >
+                        <ShoppingCart className="h-6 w-6" />
+                      </Button>
+                      <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white">
+                        {cart.length}
+                      </span>
+                    </div>
+                  </Link>
+                )}
 
                 <Button
                   variant="default"
