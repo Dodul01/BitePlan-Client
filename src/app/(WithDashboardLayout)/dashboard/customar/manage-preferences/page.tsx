@@ -15,7 +15,11 @@ import {
 import { toast } from "sonner";
 import SectionHeading from "@/components/shared/SectionHeading";
 import { getCurrentUser } from "@/services/AuthServices";
-import { createMealPreference, getMealPreference } from "@/services/Preference";
+import {
+  createMealPreference,
+  getMealPreference,
+  updateMealPreference,
+} from "@/services/Preference";
 const dietaryTypesArray = [
   "vegetarian",
   "vegan",
@@ -47,6 +51,7 @@ const spiceLevelArray = ["mild", "medium-mild", "medium", "medium-hot", "hot"];
 const portionSizeArray = ["small", "regular", "large"];
 
 const ManagePeferencs = () => {
+  const [isPereferenceCreated, setIsPereferenceCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [allergies, setAllergies] = useState<string[]>([]);
   const [dietaryTypes, setDietaryTypes] = useState<string[]>([]);
@@ -65,16 +70,19 @@ const ManagePeferencs = () => {
     });
   };
 
-  /*
-  TODO: update preference 
-
-  */
   const fetchPreferences = async () => {
     try {
       const res = await getMealPreference();
-      console.log(res.result);
-      if (res.result === null) return;
-      if (res.status === false) throw new Error("Failed to fetch preferences");
+
+      if (res.result === null) {
+        setIsPereferenceCreated(false);
+        return;
+      }
+      if (res.status === false) {
+        setIsPereferenceCreated(false);
+        throw new Error("Failed to fetch preferences");
+      }
+      setIsPereferenceCreated(true);
       setAllergies(res.result.allergies || []);
       setDietaryTypes(res.result.dietaryTypes || []);
       setCuisines(res.result.cuisines || []);
@@ -98,7 +106,14 @@ const ManagePeferencs = () => {
         portionSize,
         email: user.email,
       };
-      const result = await createMealPreference(payload);
+
+      let result;
+
+      if (isPereferenceCreated) {
+        result = await updateMealPreference(payload);
+      }
+
+      result = await createMealPreference(payload);
 
       if (result.success) {
         toast.success("Preferences updated successfully");
