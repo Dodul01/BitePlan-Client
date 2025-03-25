@@ -131,7 +131,6 @@ const FindMeals: React.FC = () => {
       setLoading(true);
       try {
         const response = await getMeals();
-        // Assuming response.data contains an array of meals
         setMeals(response.data);
         setFilteredMeals(response.data);
         setLoading(false);

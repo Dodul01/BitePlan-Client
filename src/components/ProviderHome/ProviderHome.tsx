@@ -20,7 +20,7 @@ const ProviderHome = () => {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden w-full border ">
+      <section className="relative pt-32 pb-20 overflow-hidden ">
         {/* Background decoration */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute hrefp-1/3 right-1/4 w-[500px] h-[500px] rounded-full bg-primary/10 blur-[100px]" />
@@ -30,7 +30,7 @@ const ProviderHome = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-none mb-6">
-              Welcome href Your <span className="text-primary">MealBox</span>{" "}
+              Welcome to Your <span className="text-primary">MealBox</span>{" "}
               Dashboard
             </h1>
             <p className="text-xl text-muted-foreground">
@@ -51,7 +51,7 @@ const ProviderHome = () => {
                 className="text-base px-8 rounded-full"
                 asChild
               >
-                <Link href="/provider/cushrefmers">View Cushrefmers</Link>
+                <Link href="/provider/cushrefmers">View Customers</Link>
               </Button>
             </div>
           </div>
@@ -62,8 +62,8 @@ const ProviderHome = () => {
       <section className="py-16 bg-secondary/50">
         <div className="container mx-auto px-6">
           <SectionHeading
-            title="Your Provider hrefols"
-            subtitle="Access everything you need href run your meal delivery business efficiently."
+            title="Your Provider tools"
+            subtitle="Access everything you need to run your meal delivery business efficiently."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -264,7 +264,7 @@ const ProviderHome = () => {
                     href="/provider/orders"
                     className="inline-flex items-center gap-2"
                   >
-                    Go href Order Management
+                    Go to Order Management
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
@@ -302,10 +302,10 @@ const ProviderHome = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">
-              Ready href Maximize Your Business Potential?
+              Ready to Maximize Your Business Potential?
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Explore all the hrefols and features MealBox offers href grow your
+              Explore all the tools and features MealBox offers to grow your
               food business.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">

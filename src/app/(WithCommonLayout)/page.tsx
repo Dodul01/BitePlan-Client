@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CustomarHome from "@/components/CustomarHome/CustomarHome";
 import ProviderHome from "@/components/ProviderHome/ProviderHome";
 import Banner from "@/components/shared/Banner";
 import BenefitsSection from "@/components/shared/BenefitsSection";
@@ -49,9 +48,7 @@ export default function Home() {
 
   return (
     <div>
-      {user?.role === "customer" ? (
-        <CustomarHome />
-      ) : user?.role === "seller" ? (
+      {user?.role === "seller" ? (
         <ProviderHome />
       ) : (
         <div>
