@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Mail, Phone } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -27,7 +27,7 @@ const ViewOrders = () => {
       const response = await getOrderedMeal();
       const result = response?.data?.allOrders || [];
       setOrders(result);
-      setFilteredOrders(result); 
+      setFilteredOrders(result);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
     }
@@ -44,7 +44,7 @@ const ViewOrders = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const filtered = orders.filter((order) =>
-      order.userEmail.toLowerCase().includes(searchQuery.toLowerCase())
+      order.user.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredOrders(filtered);
   };
@@ -64,6 +64,8 @@ const ViewOrders = () => {
       setFilteredOrders(filtered);
     }
   };
+
+  console.log(orders);
 
   return (
     <div>
@@ -114,40 +116,84 @@ const ViewOrders = () => {
         {/* Orders List */}
         <div className="space-y-4">
           {filteredOrders.map((order) => (
-            <Card key={order._id} className="overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row justify-between gap-4">
-                  {/* Customer Info */}
+            <Card
+              key={order._id}
+              className="overflow-hidden border rounded-xl shadow-sm"
+            >
+              <CardContent className="p-6 space-y-6">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                   <div>
-                    <h3 className="text-lg font-semibold">{order.userEmail}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Order Status: {order.status}
-                    </p>
-                    <p className="text-sm mt-1">
-                      Order Date:{" "}
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      {order.user.name}
+                    </h3>
+
+                    <div className="mt-2 space-y-1">
+                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Mail className="w-4 h-4" />
+                        {order.user.email}
+                      </p>
+                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Phone className="w-4 h-4" />
+                        {order.user.phone}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <Badge
+                      className={`capitalize ${
+                        order.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : order.status === "completed"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {order.status}
+                    </Badge>
+                    <p className="text-sm text-gray-500 mt-2">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
 
+                {/* Delivery Info */}
+                <div className="border rounded-lg p-4 bg-gray-50">
+                  <p className="text-sm text-gray-700">
+                    <span className="font-medium">Delivery Address:</span>{" "}
+                    {order.user.deliveryAddress}
+                  </p>
+                </div>
+
                 {/* Ordered Items */}
-                <div className="mt-4">
-                  <h4 className="font-medium mb-2">Ordered Items</h4>
-                  <div className="flex flex-wrap gap-2">
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">
+                    Ordered Items
+                  </h4>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {order.orderedItemIds.map((item: any, index: number) => (
-                      <Badge key={index} variant="outline">
-                        {item.name} - ${item.price.toFixed(2)}
-                      </Badge>
+                      <div
+                        key={index}
+                        className="flex justify-between items-center px-3 py-2 bg-gray-100 rounded-md"
+                      >
+                        <span className="text-sm">{item.meal.name}</span>
+                        <span className="text-sm font-medium">
+                          ${item.meal.price.toFixed(2)}
+                        </span>
+                      </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Dietary Info */}
-                <div className="mt-4">
-                  <h4 className="font-medium mb-2">Dietary Preferences</h4>
+                {/* Dietary Preferences */}
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">
+                    Dietary Preferences
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {order.orderedItemIds.map((item: any, index: number) =>
-                      item.dietaryInfo?.map(
+                      item.meal.dietaryInfo?.map(
                         (diet: string, dietIndex: number) => (
                           <Badge
                             key={`${index}-${dietIndex}`}

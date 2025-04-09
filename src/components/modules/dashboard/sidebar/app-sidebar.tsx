@@ -1,12 +1,15 @@
 "use client";
 
 import {
-  BoltIcon,
-  Bot,
+  BellRing,
+  Cog,
+  FolderCog,
+  LayoutList,
   ListOrdered,
-  Settings,
+  NotebookPen,
   ShoppingCart,
   SquareTerminal,
+  UserRoundCog,
 } from "lucide-react";
 
 import {
@@ -47,12 +50,12 @@ const data = {
     {
       title: "Manage Preferences",
       url: "/dashboard/customar/manage-preferences",
-      icon: BoltIcon,
+      icon: Cog,
     },
     {
       title: "Profile",
       url: "/dashboard/profile/customar",
-      icon: BoltIcon,
+      icon: UserRoundCog,
     },
   ],
   mealProviderMenu: [
@@ -65,22 +68,27 @@ const data = {
     {
       title: "View Orders",
       url: "/dashboard/provider/view-orders",
-      icon: Bot,
+      icon: LayoutList,
     },
     {
       title: "Respond to Orders",
       url: "/dashboard/provider/responses",
-      icon: Settings,
+      icon: BellRing,
     },
     {
       title: "Post Meal",
       url: "/dashboard/provider/post-meal",
-      icon: Settings,
+      icon: NotebookPen,
+    },
+    {
+      title: "Manage Meal",
+      url: "/dashboard/provider/manage-meal",
+      icon: FolderCog,
     },
     {
       title: "Profile",
       url: "/dashboard/profile/provider",
-      icon: Settings,
+      icon: UserRoundCog,
     },
   ],
 };

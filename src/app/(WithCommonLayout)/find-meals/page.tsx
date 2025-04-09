@@ -9,10 +9,11 @@ import {
   Leaf,
   Utensils,
   ChefHat,
+  UsersRound,
+  Clock3,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
@@ -23,8 +24,6 @@ import {
 import Image from "next/image";
 import SectionHeading from "@/components/shared/SectionHeading";
 import { getMeals } from "@/services/Meal";
-import { useCart } from "@/context/UserContext";
-import { toast } from "sonner";
 
 const DIETARY_OPTIONS = [
   "Vegetarian",
@@ -63,7 +62,6 @@ const FindMeals: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [filteredMeals, setFilteredMeals] = useState<Array<any>>([]);
-  const { setCart } = useCart();
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,8 +69,7 @@ const FindMeals: React.FC = () => {
     setSearchTerm(value);
     applyFilters(value, activeFilters);
   };
-  console.log(meals);
-  
+
   // Toggle filter option
   const toggleFilter = (filter: string) => {
     setActiveFilters((prev) => {
@@ -142,6 +139,8 @@ const FindMeals: React.FC = () => {
 
     fetchMeals();
   }, []);
+
+  console.log(meals);
 
   return (
     <div>
@@ -328,22 +327,16 @@ const FindMeals: React.FC = () => {
           )}
         </div>
 
-        {/* Tabs for viewing options */}
-        <Tabs defaultValue="all" className="max-w-6xl mx-auto mb-8">
-          <TabsList className="w-full max-w-md mx-auto grid grid-cols-3 mb-8">
-            <TabsTrigger value="all">All Meals</TabsTrigger>
-            <TabsTrigger value="popular">Popular</TabsTrigger>
-            <TabsTrigger value="new">New Arrivals</TabsTrigger>
-          </TabsList>
-
+        {/* Meals container*/}
+        <div className="max-w-6xl mx-auto mb-8">
           {/*TODO: Need to add a loading spinner here  */}
-          <TabsContent value="all" className="mt-6">
+          <div className="mt-6">
             {loading === true || filteredMeals?.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredMeals.map((meal) => (
                   <div
                     key={meal._id}
-                    className="border rounded-lg overflow-hidden shadow"
+                    className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 bg-white"
                   >
                     <Image
                       height={400}
@@ -352,41 +345,53 @@ const FindMeals: React.FC = () => {
                       alt={meal.name}
                       className="w-full h-48 object-cover"
                     />
+
                     <div className="p-4">
-                      <h3 className="text-xl font-bold">{meal.name}</h3>
-                      <p className="text-sm text-gray-600">
+                      {/* Title */}
+                      <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                        {meal.name}
+                      </h3>
+
+                      {/* Provider Info */}
+                      <p className="text-sm text-gray-500 mb-2">
+                        Provider: {meal.busisnessName}
+                      </p>
+
+                      {/* Description */}
+                      <p className="text-sm text-gray-700 mb-3">
                         {meal.description}
                       </p>
-                      <div className="flex justify-between mt-4">
-                        <span className="text-sm">Prep: {meal.prepTime}</span>
-                        <span className="text-sm">
-                          Servings: {meal.servings}
-                        </span>
-                      </div>
-                      <div className="mt-2 flex justify-between">
-                        <div className="flex gap-2 flex-wrap">
-                          {meal.tags.map((tag: any, index: number) => (
-                            <Badge variant={"outline"} key={index}>
-                              {tag}
-                            </Badge>
-                          ))}
+
+                      {/* Preparation Time and Servings */}
+                      <div className="flex items-center justify-between text-gray-600 text-sm mb-3">
+                        <div className="flex items-center gap-2">
+                          <Clock3 /> {meal.prepTime}
                         </div>
-                        <h3 className="text-lg font-semibold text-green-600">
-                          ${meal.price}
-                        </h3>
+                        <div className="flex items-center gap-2">
+                          <UsersRound />
+                          <span className="font-medium">{meal.servings}</span>
+                        </div>
                       </div>
-                      <div className="mt-2">
-                        <Button
-                          onClick={() => {
-                            setCart((previousMeal: any) => [
-                              ...previousMeal,
-                              meal,
-                            ]);
-                            toast.success("Food added to your cart.");
-                          }}
-                        >
-                          Order Now
-                        </Button>
+
+                      {/* Dietary Info Tags */}
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {meal?.dietaryInfo?.map((tag: any, index: number) => (
+                          <span
+                            key={index}
+                            className="text-sm px-2 py-1 rounded-full bg-green-100 text-green-700"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* General Tags */}
+                      <div className="flex flex-wrap gap-2">
+                        {meal.tags.map((tag: any, index: number) => (
+                          <Badge variant="outline" key={index}>
+                            {tag}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -403,118 +408,8 @@ const FindMeals: React.FC = () => {
                 <Button onClick={clearFilters}>Clear All Filters</Button>
               </div>
             )}
-          </TabsContent>
-
-          <TabsContent value="popular" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {meals
-                .filter((meal: any) => meal.rating > 4.7)
-                .map((meal: any) => (
-                  <div
-                    key={meal._id}
-                    className="border rounded-lg overflow-hidden shadow"
-                  >
-                    <Image
-                      height={400}
-                      width={400}
-                      src={meal.image}
-                      alt={meal.name}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="p-4">
-                      <h3 className="text-xl font-bold">{meal.name}</h3>
-                      <p className="text-sm text-gray-600">
-                        {meal.description}
-                      </p>
-                      <div className="flex justify-between mt-4">
-                        <span className="text-sm">Prep: {meal.prepTime}</span>
-                        <span className="text-sm">
-                          Servings: {meal.servings}
-                        </span>
-                      </div>
-                      <div className="mt-2 flex justify-between">
-                        <div className="flex gap-2 flex-wrap">
-                          {meal.tags.map((tag: any, index: number) => (
-                            <Badge variant={"outline"} key={index}>
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                        <h3 className="text-lg font-semibold text-green-600">
-                          ${meal.price}
-                        </h3>
-                      </div>
-                      <div className="mt-2">
-                        <Button
-                          onClick={() => {
-                            setCart((previousMeal: any) => [
-                              ...previousMeal,
-                              meal,
-                            ]);
-                            toast.success("Food added to your cart.");
-                          }}
-                        >
-                          Order Now
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="new" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {meals.slice(0, 3).map((meal: any) => (
-                <div
-                  key={meal._id}
-                  className="border rounded-lg overflow-hidden shadow"
-                >
-                  <Image
-                    height={400}
-                    width={400}
-                    src={meal.image}
-                    alt={meal.name}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-4">
-                    <h3 className="text-xl font-bold">{meal.name}</h3>
-                    <p className="text-sm text-gray-600">{meal.description}</p>
-                    <div className="flex justify-between mt-4">
-                      <span className="text-sm">Prep: {meal.prepTime}</span>
-                      <span className="text-sm">Servings: {meal.servings}</span>
-                    </div>
-                    <div className="mt-2 flex justify-between">
-                      <div className="flex gap-2 flex-wrap">
-                        {meal.tags.map((tag: any, index: number) => (
-                          <Badge variant={"outline"} key={index}>
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <h3 className="text-lg font-semibold text-green-600">
-                        ${meal.price}
-                      </h3>
-                    </div>
-                    <div className="mt-2">
-                      <Button
-                        onClick={() => {
-                          setCart((previousMeal: any) => [
-                            ...previousMeal,
-                            meal,
-                          ]);
-                          toast.success("Food added to your cart.");
-                        }}
-                      >
-                        Order Now
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
     </div>
   );

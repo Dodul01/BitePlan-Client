@@ -41,10 +41,11 @@ const CheckoutForm = () => {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const { cart: cartItems } = useCart();
 
-  const subtotal = cartItems.reduce(
-    (total: any, item: any) => total + item.price,
-    0
-  );
+  const subtotal = cartItems.reduce((total: number, item: any) => {
+    const price = item?.price ?? item.meal.price ?? 0;
+    return total + price;
+  }, 0);
+
   const shipping = 4.99;
   const tax = subtotal * 0.0825; // 8.25% tax rate
   const total = subtotal + shipping + tax;
@@ -70,35 +71,29 @@ const CheckoutForm = () => {
         return;
       }
 
-      console.log(paymentMethod);
-
-      // Extract only order IDs
-      const orderIds = cartItems.map((item: any) => item._id); // Ensure it's an array
-
       // Send order IDs and paymentMethod directly (no extra wrapper)
       const orderData = {
-        orderedItemIds: orderIds, // Send this directly as an array
+        orderedItemIds: cartItems,
         user: user,
         paymentMethod: {
           id: paymentMethod.id,
           type: paymentMethod.type,
-          card: paymentMethod.card || undefined, // Optional
+          card: paymentMethod.card || undefined,
         },
       };
+      console.log(orderData);
 
-      const result = await orderMeal(orderData); // Send properly formatted data
+      const result = await orderMeal(orderData);
 
-      console.log(result);
-
-      // if (result?.status === 200) {
-      //   toast.success("Order placed successfully.");
-      //   window.location.assign("/order-tracking");
-      // } else {
-      //   toast.error("Order failed. Please try again.");
-      // }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      if (result?.success) {
+        toast.success("Order placed successfully.");
+        window.location.assign("/dashboard/customar/track-order");
+      } else {
+        toast.error("Order failed. Please try again.");
+      }
     } catch (err: any) {
       toast.error("Something went wrong");
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -118,6 +113,8 @@ const CheckoutForm = () => {
   useEffect(() => {
     getuser();
   }, []);
+
+  // console.log("form cart item page", cartItems);
 
   if (paymentSuccess) {
     return (
@@ -170,34 +167,50 @@ const CheckoutForm = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {cartItems.map((item: any) => (
+                {/* {cartItems.map((item: any) => (
                   <div key={item.id} className="flex justify-between">
                     <span>
                       {item.name} x {item.quantity}
                     </span>
                     <span className="font-medium">
-                      ${item.price.toFixed(2)}
+                      ${item.price?.toFixed(2)}
                     </span>
                   </div>
-                ))}
+                ))} */}
+                {cartItems.map((item: any, index: number) => {
+                  const name = item.name ?? item.meal?.name ?? "Unknown Item";
+                  const price = item.price ?? item.meal?.price ?? 0;
+                  const quantity = item.quantity ?? 1;
+
+                  return (
+                    <div key={index} className="flex justify-between">
+                      <span>
+                        {name} x {quantity}
+                      </span>
+                      <span className="font-medium">
+                        ${(price * quantity).toFixed(2)}
+                      </span>
+                    </div>
+                  );
+                })}
 
                 <Separator className="my-4" />
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>${subtotal?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span>${shipping.toFixed(2)}</span>
+                  <span>${shipping?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>${tax?.toFixed(2)}</span>
                 </div>
                 <Separator className="my-4" />
                 <div className="flex justify-between font-bold">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>${total?.toFixed(2)}</span>
                 </div>
               </div>
             </CardContent>
@@ -233,7 +246,7 @@ const CheckoutForm = () => {
                   className="w-full py-6 text-lg"
                   disabled={loading}
                 >
-                  {loading ? "Processing..." : `Pay $${total.toFixed(2)}`}
+                  {loading ? "Processing..." : `Pay $${total?.toFixed(2)}`}
                 </Button>
               </form>
             </CardContent>

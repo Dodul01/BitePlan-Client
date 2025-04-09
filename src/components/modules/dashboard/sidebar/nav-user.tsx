@@ -16,16 +16,49 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useUser } from "@/context/UserContext";
-import { logout } from "@/services/AuthServices";
+import { useCart } from "@/context/UserContext";
+import { getCurrentUser, logout } from "@/services/AuthServices";
+import { useEffect, useState } from "react";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const user = useUser();
+  interface User {
+    name?: string;
+    email?: string;
+    user?: {
+      name: string;
+      email: string;
+    };
+  }
+  const [user, setUser] = useState<User | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isUserLoading, setIsUserLoading] = useState(false);
+
+  // const user = useUser();
+  const { setCart } = useCart();
 
   const handleLogout = () => {
+    setCart([]);
     logout();
   };
+
+  const getuser = async () => {
+    setIsUserLoading(true);
+    const user = await getCurrentUser();
+    
+    console.log('from nav user', user);
+    
+    if (user) {
+      setUser(user);
+      setIsUserLoading(false);
+    } else {
+      setIsUserLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getuser();
+  }, []);
 
   return (
     <SidebarMenu>
@@ -42,14 +75,14 @@ export function NavUser() {
                   alt={"user image"}
                 />
                 <AvatarFallback className="rounded-lg">
-                  {user?.user?.name}
+                  {user?.name}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {user?.user?.name}
+                  {user?.name}
                 </span>
-                <span className="truncate text-xs">{user?.user?.email}</span>
+                <span className="truncate text-xs">{user?.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -73,9 +106,9 @@ export function NavUser() {
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {user?.user?.name}
+                    {user?.name}
                   </span>
-                  <span className="truncate text-xs">{user?.user?.email}</span>
+                  <span className="truncate text-xs">{user?.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
