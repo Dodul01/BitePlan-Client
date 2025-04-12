@@ -140,7 +140,7 @@ const FindMeals: React.FC = () => {
     fetchMeals();
   }, []);
 
-  console.log(meals);
+  // console.log(meals);
 
   return (
     <div>

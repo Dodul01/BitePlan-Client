@@ -135,6 +135,7 @@ const CustomarProfilePage = () => {
                       onChange={handleChange}
                       className="pl-10"
                       required
+                      readOnly
                     />
                   </div>
                 </div>

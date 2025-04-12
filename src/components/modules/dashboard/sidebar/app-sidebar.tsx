@@ -6,6 +6,7 @@ import {
   FolderCog,
   LayoutList,
   ListOrdered,
+  MousePointerClick,
   NotebookPen,
   ShoppingCart,
   SquareTerminal,
@@ -43,6 +44,11 @@ const data = {
       icon: ShoppingCart,
     },
     {
+      title: "Select Meals",
+      url: "/dashboard/customar/select-meals",
+      icon: MousePointerClick,
+    },
+    {
       title: "Track Orders",
       url: "/dashboard/customar/track-order",
       icon: ListOrdered,
@@ -66,6 +72,11 @@ const data = {
       isActive: true,
     },
     {
+      title: "Manage Manus",
+      url: "/dashboard/provider/manage-meal",
+      icon: FolderCog,
+    },
+    {
       title: "View Orders",
       url: "/dashboard/provider/view-orders",
       icon: LayoutList,
@@ -80,11 +91,7 @@ const data = {
       url: "/dashboard/provider/post-meal",
       icon: NotebookPen,
     },
-    {
-      title: "Manage Meal",
-      url: "/dashboard/provider/manage-meal",
-      icon: FolderCog,
-    },
+
     {
       title: "Profile",
       url: "/dashboard/profile/provider",
