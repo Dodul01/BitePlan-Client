@@ -142,17 +142,15 @@ const PostMealPage: React.FC = () => {
     const fetchUser = async () => {
       const user = await getCurrentUser();
       setCurrentUser(user);
-  
+
       // Update form state with business name after user data is fetched
       setForm((prevForm) => ({
         ...prevForm,
-        busisnessName: user?.busisnessName || "", // Set business name from user data
+        busisnessName: user?.busisnessName || "",
       }));
     };
     fetchUser();
   }, []);
-  
-
 
   return (
     <div>
@@ -164,6 +162,7 @@ const PostMealPage: React.FC = () => {
               Add your meal information which will be visible to customers.
             </p>
           </div>
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Meal Name */}
             <div>

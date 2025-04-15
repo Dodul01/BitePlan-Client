@@ -218,10 +218,17 @@ const OrderMealPage = () => {
                           ))}
                         </div>
                       )}
+
+                      <p className="font-bold text-[#44C356] mt-3">
+                        {" "}
+                        ${meal?.price?.toFixed(2)}
+                      </p>
                     </CardContent>
 
-                    <CardFooter className="font-bold text-[#44C356]">
-                      ${meal?.price?.toFixed(2)}
+                    <CardFooter>
+                      <Button className="mt-5 w-full cursor-pointer transition-all ease-in-out duration-300 hover:outline-2 hover:outline-[#44C356] hover:text-[#44C356] hover:bg-white rounded-full">
+                        Order Now
+                      </Button>
                     </CardFooter>
                   </Card>
                 </div>

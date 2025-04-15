@@ -9,6 +9,7 @@ import { useCart } from "@/context/UserContext";
 import { getCurrentUser } from "@/services/AuthServices";
 import { orderMeal } from "@/services/Order";
 import { TrashIcon } from "lucide-react";
+import emptyCart from "../../../../../../public/Empty-cuate.png";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,11 +23,6 @@ const CartPage = () => {
   const { cart } = useCart();
   const router = useRouter();
 
-  // const totalPrice = cart.reduce(
-  //   (sum: number, item: any) => sum + Number(item.price),
-  //   0
-  // );
-
   const totalPrice = cart.reduce((sum: number, item: any) => {
     // (??) Nullish Coalescing Operator
 
@@ -38,13 +34,9 @@ const CartPage = () => {
     return sum + Number(price);
   }, 0);
   console.log(cart);
-  
+
   const handleCheckout = async () => {
     const orderedItemId = cart.map((i: any) => i._id);
-    // const res = await orderMeal(orderedItemId);
-    // console.log(res);
-    // router.push('/checkout')
-    // console.log(orderedItemId);
   };
 
   useEffect(() => {
@@ -68,40 +60,6 @@ const CartPage = () => {
       <div className="flex flex-col md:flex-row gap-6 mx-4">
         <div className="md:w-2/3 space-y-4">
           {cart.length > 0 ? (
-            // cart.map((item: any, idx: number) => (
-            //   <div
-            //     key={idx}
-            //     className="flex flex-col md:flex-row bg-white shadow-md rounded-lg overflow-hidden"
-            //   >
-            //     <div className="relative h-40 w-full md:w-1/3">
-            //       <Image
-            //         src={item.image}
-            //         alt={`${item.name} Image`}
-            //         layout="fill"
-            //         objectFit="cover"
-            //       />
-            //     </div>
-            //     <div className="p-4 flex flex-col justify-between flex-grow">
-            //       <div>
-            //         <h2 className="text-xl font-semibold">{item.name}</h2>
-            //         <p className="text-lg font-bold text-green-600 mt-1"></p>
-            //         <div className="mt-2 flex flex-wrap gap-2">
-            //           {item.tags.map((tag: any, index: number) => (
-            //             <Badge
-            //               key={index}
-            //               className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs"
-            //             >
-            //               {tag}
-            //             </Badge>
-            //           ))}
-            //         </div>
-            //         <p className="mt-2 text-sm text-gray-500">
-            //           Servings: {item.servings}
-            //         </p>
-            //       </div>
-            //     </div>
-            //   </div>
-            // ))
             cart.map((item: any, idx: number) => {
               // If item has `meal` field, it's a scheduled meal with customization
               const meal = item.meal || item; // fallback to item itself if no nested meal
@@ -141,14 +99,12 @@ const CartPage = () => {
                         Servings: {meal.servings}
                       </p>
 
-                      {/* Conditionally show customization if present */}
                       {item.customization && (
                         <p className="text-sm text-blue-500 mt-1">
                           Customization: {item.customization}
                         </p>
                       )}
 
-                      {/* Conditionally show schedule if present */}
                       {item.schedule && (
                         <p className="text-sm text-purple-500 mt-1">
                           Scheduled For:{" "}
@@ -161,7 +117,27 @@ const CartPage = () => {
               );
             })
           ) : (
-            <p className="text-center text-gray-500">Your cart is empty.</p>
+            <div className="flex flex-col items-center justify-center py-16 px-4 text-center space-y-6">
+              <Image
+                src={emptyCart}
+                height={300}
+                width={300}
+                alt="Empty cart image"
+                className="mx-auto"
+              />
+              <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">
+                Your cart is empty
+              </h2>
+              <p className="text-gray-500 max-w-md">
+                Looks like you haven’t added any meals to your cart yet. Start
+                exploring delicious options now!
+              </p>
+              <Link href="/find-meals">
+                <Button className="bg-primary text-white px-6 py-2 rounded-full shadow-md hover:bg-primary/90 transition-all">
+                  Find Meals
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
         {/* details */}

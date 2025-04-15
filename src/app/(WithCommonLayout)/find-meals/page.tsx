@@ -140,8 +140,6 @@ const FindMeals: React.FC = () => {
     fetchMeals();
   }, []);
 
-  // console.log(meals);
-
   return (
     <div>
       <div className="container mx-auto px-4 py-16 md:py-24">

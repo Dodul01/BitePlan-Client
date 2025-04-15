@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Meal } from "./FeaturedMealsSection";
 import { Button } from "../ui/button";
-import Link from "next/link";
 
 interface MealCardProps {
   meal: Meal;
@@ -13,7 +12,7 @@ const MealCard: React.FC<MealCardProps> = ({ meal }) => {
       <div className="relative h-48 w-full">
         <Image
           src={meal.image}
-          alt={meal.title}
+          alt={"meal image"}
           fill
           className="object-cover"
         />
@@ -28,7 +27,7 @@ const MealCard: React.FC<MealCardProps> = ({ meal }) => {
           <h4 className="text-2xl">${meal.price}</h4>
         </div>
         <Button className="mt-5 w-full cursor-pointer transition-all ease-in-out duration-300 hover:outline-2 hover:outline-[#44C356] hover:text-[#44C356] hover:bg-white rounded-full">
-          <Link href={`/meal/${meal.id}`}>View Details</Link>
+          Order Now
         </Button>
       </div>
     </div>

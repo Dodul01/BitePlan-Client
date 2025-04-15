@@ -214,8 +214,8 @@ const Nav = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 top-[68px] z-50 bg-white">
-          <div className="h-full overflow-y-auto p-6 pb-20 animate-fade-in">
+        <div className="fixed inset-0 z-50 h-screen bg-white flex justify-center items-center">
+          <div className="w-full max-w-md h-full overflow-y-auto p-6 pb-20 animate-fade-in">
             <div className="space-y-2">
               {navItems.map((item) =>
                 item.subItems ? (

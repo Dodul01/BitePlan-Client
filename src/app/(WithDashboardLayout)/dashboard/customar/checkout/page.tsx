@@ -167,16 +167,6 @@ const CheckoutForm = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* {cartItems.map((item: any) => (
-                  <div key={item.id} className="flex justify-between">
-                    <span>
-                      {item.name} x {item.quantity}
-                    </span>
-                    <span className="font-medium">
-                      ${item.price?.toFixed(2)}
-                    </span>
-                  </div>
-                ))} */}
                 {cartItems.map((item: any, index: number) => {
                   const name = item.name ?? item.meal?.name ?? "Unknown Item";
                   const price = item.price ?? item.meal?.price ?? 0;

@@ -7,6 +7,7 @@ import { Eye, EyeOff, Mail, Lock, Phone } from "lucide-react";
 import Link from "next/link";
 import { registerUser } from "@/services/AuthServices";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 // You can replace these with process.env.NEXT_PUBLIC_CLOUD_NAME etc.
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_NAME || "dbwrot7po";
@@ -26,6 +27,7 @@ const SignUp = () => {
   const [businessName, setBusinessName] = useState("");
   const [cuisineSpecialties, setCuisineSpecialties] = useState("");
   const [logo, setLogo] = useState<File | null>(null);
+  const router = useRouter();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -72,7 +74,7 @@ const SignUp = () => {
     if (userType === "seller" && logo) {
       try {
         logoUrl = await handleCloudinaryUpload(logo);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         alert("Image upload failed, please try again.");
         setIsLoading(false);
@@ -99,10 +101,11 @@ const SignUp = () => {
 
       if (res.success && res.result && res.result._id) {
         toast.success("Sign Up Successfully.");
+        router.push("/sign-in");
       } else if (!res.success) {
         toast.error(res.message);
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Registration error:", err);
       toast.error("Something went wrong");

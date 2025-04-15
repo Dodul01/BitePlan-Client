@@ -113,9 +113,8 @@ const Testimonials = () => {
             ))}
           </CarouselContent>
           {/* button */}
-
-          <CarouselPrevious className="cursor-pointer" />
-          <CarouselNext className="cursor-pointer" />
+          <CarouselPrevious className="cursor-pointer hidden md:flex" />
+          <CarouselNext className="cursor-pointer hidden md:flex" />
         </Carousel>
       </div>
     </section>

@@ -72,8 +72,8 @@ const data = {
       isActive: true,
     },
     {
-      title: "Manage Manus",
-      url: "/dashboard/provider/manage-meal",
+      title: "Manage Menus",
+      url: "/dashboard/provider/manage-menus",
       icon: FolderCog,
     },
     {

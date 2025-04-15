@@ -39,7 +39,7 @@ const Banner: React.FC<BannerSectionProps> = () => {
                 className="text-base px-8 rounded-full hover:scale-105 transition-transform"
                 asChild
               >
-                <Link href="/meal-plans">Explore Meal Plans</Link>
+                <Link href="/find-meals">Explore Meals</Link>
               </Button>
               <Button
                 variant="outline"
@@ -106,7 +106,7 @@ const Banner: React.FC<BannerSectionProps> = () => {
                   <Image
                     height={200}
                     width={200}
-                    src="https://images.unsplash.com/photo-1565895405139-e188df996e0b?q=80&w=2487&fm=jpg&crop=entropy&cs=tinysrgb"
+                    src="https://media.istockphoto.com/id/1316145932/photo/table-top-view-of-spicy-food.jpg?s=612x612&w=0&k=20&c=eaKRSIAoRGHMibSfahMyQS6iFADyVy1pnPdy1O5rZ98="
                     alt="Chef Preparing Food"
                     className="w-full h-full object-cover"
                   />
