@@ -81,9 +81,9 @@ const CheckoutForm = () => {
           card: paymentMethod.card || undefined,
         },
       };
-      console.log(orderData);
 
       const result = await orderMeal(orderData);
+      console.log(result);
 
       if (result?.success) {
         toast.success("Order placed successfully.");

@@ -66,7 +66,11 @@ const OrderTracking = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const filtered = orders.filter((order) =>
-      order.name.toLowerCase().includes(searchQuery.toLowerCase())
+      order.orderedItemIds.some((item: any) =>
+        item.meal?.name
+          ?.toLowerCase()
+          .includes(searchQuery.trim().toLowerCase())
+      )
     );
     setFilteredOrders(filtered);
     if (filtered.length === 0) {
@@ -138,8 +142,8 @@ const OrderTracking = () => {
                           <div>
                             <p className="font-medium">{item.meal?.name}</p>
                             <p className="text-sm text-gray-500">
-                              {item.meal?.busisnessName || "No Business Name"}{" "}
-                              - {item.meal?.cuisine || "Cuisine not specified"}
+                              {item.meal?.busisnessName || "No Business Name"} -{" "}
+                              {item.meal?.cuisine || "Cuisine not specified"}
                             </p>
                             <p className="text-xs text-muted-foreground">
                               Customization: {item.customization || "None"}
