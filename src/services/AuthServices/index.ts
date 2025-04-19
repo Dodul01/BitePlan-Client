@@ -7,13 +7,16 @@ import { jwtDecode } from "jwt-decode";
 
 export const registerUser = async (userData: any) => {
   try {
-    const res = await fetch(`http://localhost:5000/api/users/create-user`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
+    const res = await fetch(
+      `https://mealbox-server-nine.vercel.app/api/users/create-user`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      }
+    );
     const result = await res.json();
     return result;
   } catch (error: any) {

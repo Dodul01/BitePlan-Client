@@ -1,27 +1,27 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-export enum DietaryOptions {
-  Vegetarian = "Vegetarian",
-  Vegan = "Vegan",
-  GlutenFree = "Gluten-Free",
-  DairyFree = "Dairy-Free",
-  Keto = "Keto",
-  Paleo = "Paleo",
-  LowCarb = "Low Carb",
-  HighProtein = "High Protein",
-}
+// export enum DietaryOptions {
+//   Vegetarian = "Vegetarian",
+//   Vegan = "Vegan",
+//   GlutenFree = "Gluten-Free",
+//   DairyFree = "Dairy-Free",
+//   Keto = "Keto",
+//   Paleo = "Paleo",
+//   LowCarb = "Low Carb",
+//   HighProtein = "High Protein",
+// }
 
-export enum CuisineOptions {
-  American = "American",
-  Italian = "Italian",
-  Mexican = "Mexican",
-  Indian = "Indian",
-  Mediterranean = "Mediterranean",
-  Asian = "Asian",
-  Fusion = "Fusion",
-  Thai = "Thai",
-}
+// export enum CuisineOptions {
+//   American = "American",
+//   Italian = "Italian",
+//   Mexican = "Mexican",
+//   Indian = "Indian",
+//   Mediterranean = "Mediterranean",
+//   Asian = "Asian",
+//   Fusion = "Fusion",
+//   Thai = "Thai",
+// }
 
 import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { addMeal } from "@/services/Meal";
 import { getCurrentUser } from "@/services/AuthServices";
+import { DietaryOptions, CuisineOptions } from "@/constants/meal-options";
 
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_NAME || "dbwrot7po";
 const UPLOAD_PRESET =
