@@ -34,7 +34,6 @@ The project was developed following best practices in frontend development, focu
 4. **State Management**: Implemented Context API for managing user and cart state globally.
 5. **Authentication**: Integrated JWT-based authentication for secure access to user-specific features.
 6. **Responsive Design**: Ensured the application is fully responsive across devices using Tailwind CSS.
-7. **Testing & Optimization**: Performed manual testing and optimized for performance and accessibility.
 
 ## Getting Started
 
