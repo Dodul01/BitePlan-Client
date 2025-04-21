@@ -30,7 +30,7 @@ The project was developed following best practices in frontend development, focu
 
 1. **Project Setup**: Initialized with Vite and configured with React and Tailwind CSS.
 2. **Component Design**: Developed modular components for meals, cart, authentication, and navigation.
-3. **API Integration**: Used Axios to connect with the backend, handling data fetching and error management.
+3. **API Integration**: Used service function to connect with the backend, handling data fetching and error management.
 4. **State Management**: Implemented Context API for managing user and cart state globally.
 5. **Authentication**: Integrated JWT-based authentication for secure access to user-specific features.
 6. **Responsive Design**: Ensured the application is fully responsive across devices using Tailwind CSS.
