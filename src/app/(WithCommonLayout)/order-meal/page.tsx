@@ -272,6 +272,11 @@ const OrderMealPage = () => {
                   )}
                 </div>
 
+                <p className="text-sm bg-[#FFC400] text-black  rounded-lg text-center">
+                  *IF YOU DON&apos;T NEED TO CUSTOMIZE YOUR MEAL, CLICK ON
+                  COMPLETE ORDER*
+                </p>
+
                 <p className="text-gray-600 text-sm">{meal.description}</p>
 
                 {/* Customization and Delivery Inputs */}

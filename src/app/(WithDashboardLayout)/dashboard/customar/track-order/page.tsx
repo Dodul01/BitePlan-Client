@@ -78,8 +78,6 @@ const OrderTracking = () => {
     }
   };
 
-  console.log(orders);
-
   return (
     <div>
       <div className="bg-white m-4 rounded-lg border shadow py-5">

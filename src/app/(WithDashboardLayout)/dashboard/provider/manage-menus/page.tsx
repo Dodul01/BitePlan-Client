@@ -27,8 +27,27 @@ const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_NAME || "dbwrot7po";
 const UPLOAD_PRESET =
   process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "lkjadsflkjsdafkljasdf";
 
-const dietaryOptions = ["Vegetarian", "Vegan", "Gluten-Free", "Keto", "Paleo"];
-const cuisineOptions = ["Italian", "Chinese", "Indian", "Mexican", "Thai"];
+const dietaryOptions = [
+  "Vegetarian",
+  "Vegan",
+  "Gluten-Free",
+  "Dairy-Free",
+  "Keto",
+  "Paleo",
+  "Low Carb",
+  "High Protein",
+];
+const cuisineOptions = [
+  "American",
+  "Italian",
+  "Chinese",
+  "Mediterranean",
+  "Indian",
+  "Asian",
+  "Fusion",
+  "Mexican",
+  "Thai",
+];
 
 const handleCloudinaryUpload = async (file: File): Promise<string> => {
   const formData = new FormData();
