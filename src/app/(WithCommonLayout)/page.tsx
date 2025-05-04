@@ -9,6 +9,7 @@ import HowItWorksSection from "@/components/shared/HowItWorksSection";
 import Testimonials from "@/components/shared/Testimonials";
 import { getUserFromDB } from "@/services/User";
 import Loading from "@/components/shared/Loading";
+import LimitedTimeOffer from "@/components/shared/LimitedTimeOffer";
 
 interface User {
   name: string;
@@ -52,9 +53,9 @@ export default function Home() {
         <ProviderHome />
       ) : (
         <div>
-          {/* Detault home page */}
           <Banner />
           <HowItWorksSection />
+          <LimitedTimeOffer />
           <FeaturedMealsSection />
           <BenefitsSection />
           <Testimonials />

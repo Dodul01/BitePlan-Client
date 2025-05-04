@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BitePlan",
+  title: "MealBox",
   description:
-    "BitePlan is a personalized meal planning and delivery platform that tailors meal plans to your dietary needs. Enjoy curated menus, easy ordering, and secure scheduling for delicious, healthy meals delivered right to your door.",
+    "MealBox is a personalized meal planning and delivery platform that tailors meal plans to your dietary needs. Enjoy curated menus, easy ordering, and secure scheduling for delicious, healthy meals delivered right to your door.",
 };
 
 export default function RootLayout({

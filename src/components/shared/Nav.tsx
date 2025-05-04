@@ -24,8 +24,11 @@ import { useCart } from "@/context/UserContext";
 
 interface NavItem {
   label: string;
-  href: string;
-  subItems?: { label: string; href: string }[];
+  href?: string;
+  subGroups?: {
+    groupLabel: string;
+    items: { label: string; href: string }[];
+  }[];
 }
 
 interface User {
@@ -35,12 +38,47 @@ interface User {
 const navItems: NavItem[] = [
   { label: "Home", href: "/" },
   {
-    label: "Find Meals",
+    label: "Browse Meals",
     href: "/find-meals",
+    subGroups: [
+      {
+        groupLabel: "Dietary Preferences",
+        items: [
+          { label: "Vegetarian", href: "/find-meals?diet=Vegetarian" },
+          { label: "Vegan", href: "/find-meals?diet=vegan" },
+          { label: "Gluten-Free", href: "/find-meals?diet=gluten-free" },
+          { label: "Dairy-Free", href: "/find-meals?diet=dairy-free" },
+          { label: "Keto", href: "/find-meals?diet=keto" },
+          { label: "Paleo", href: "/find-meals?diet=paleo" },
+          { label: "Low Carb", href: "/find-meals?diet=low-carb" },
+          { label: "High Protein", href: "/find-meals?diet=high-protein" },
+        ],
+      },
+      {
+        groupLabel: "Cuisine Types",
+        items: [
+          { label: "American", href: "/find-meals?cuisine=american" },
+          { label: "Italian", href: "/find-meals?cuisine=italian" },
+          { label: "Mexican", href: "/find-meals?cuisine=mexican" },
+          { label: "Indian", href: "/find-meals?cuisine=indian" },
+          {
+            label: "Mediterranean",
+            href: "/find-meals?cuisine=mediterranean",
+          },
+          { label: "Asian", href: "/find-meals?cuisine=asian" },
+          { label: "Fusion", href: "/find-meals?cuisine=fusion" },
+          { label: "Thai", href: "/find-meals?cuisine=thai" },
+        ],
+      },
+    ],
   },
   {
     label: "Order Meal",
     href: "/order-meal",
+  },
+  {
+    label: "Vendors",
+    href: "/vendors",
   },
   { label: "How It Works", href: "/how-it-works" },
   { label: "About Us", href: "/about" },
@@ -96,7 +134,7 @@ const Nav = () => {
             className="text-2xl font-semibold tracking-tight flex items-center gap-2"
           >
             <ShoppingBag className="h-6 w-6 text-primary" />
-            <span>BitePlan</span>
+            <span>MealBox</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -106,31 +144,38 @@ const Nav = () => {
                 key={item.label}
                 className="relative"
                 onMouseEnter={() =>
-                  item.subItems && setOpenDropdown(item.label)
+                  item.subGroups && setOpenDropdown(item.label)
                 }
                 onMouseLeave={() => setOpenDropdown(null)}
               >
                 <Link
-                  href={item.href}
+                  href={item.href ?? "/"}
                   className={cn(
                     "text-sm font-medium transition-colors hover:text-primary flex items-center space-x-1",
                     isScrolled ? "text-foreground" : "text-foreground"
                   )}
                 >
                   <span>{item.label}</span>
-                  {item.subItems && <ChevronDown className="h-4 w-4" />}
+                  {item.subGroups && <ChevronDown className="h-4 w-4" />}
                 </Link>
 
-                {item.subItems && openDropdown === item.label && (
-                  <div className="absolute left-0 mt-1 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 py-1 animate-fade-in">
-                    {item.subItems.map((subItem) => (
-                      <Link
-                        key={subItem.label}
-                        href={subItem.href}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        {subItem.label}
-                      </Link>
+                {item.subGroups && openDropdown === item.label && (
+                  <div className="absolute left-0 mt-1 w-[600px] bg-white shadow-lg ring-1 ring-black ring-opacity-5 py-4 px-6 rounded-md grid grid-cols-2 gap-6 animate-fade-in">
+                    {item.subGroups.map((group) => (
+                      <div key={group.groupLabel}>
+                        <p className="text-sm font-semibold text-gray-600 mb-2">
+                          {group.groupLabel}
+                        </p>
+                        {group.items.map((subItem) => (
+                          <Link
+                            key={subItem.label}
+                            href={subItem.href}
+                            className="block text-sm text-gray-700 hover:text-primary py-1"
+                          >
+                            {subItem.label}
+                          </Link>
+                        ))}
+                      </div>
                     ))}
                   </div>
                 )}
@@ -218,7 +263,7 @@ const Nav = () => {
           <div className="w-full max-w-md h-full overflow-y-auto p-6 pb-20 animate-fade-in">
             <div className="space-y-2">
               {navItems.map((item) =>
-                item.subItems ? (
+                item.subGroups ? (
                   <Accordion
                     key={item.label}
                     type="single"
@@ -231,21 +276,23 @@ const Nav = () => {
                       </AccordionTrigger>
                       <AccordionContent className="pb-2">
                         <div className="space-y-2 pl-4">
-                          {item.subItems.map((subItem) => (
-                            <div
-                              key={subItem.label}
-                              className="py-2 border-b border-gray-50"
-                            >
-                              <Link
-                                href={subItem.href}
-                                className="flex items-center justify-between text-sm hover:text-primary"
-                                onClick={() => setIsMobileMenuOpen(false)}
+                          {item.subGroups.map((group) =>
+                            group.items.map((subItem) => (
+                              <div
+                                key={subItem.label}
+                                className="py-2 border-b border-gray-50"
                               >
-                                {subItem.label}
-                                <ChevronRight className="h-4 w-4" />
-                              </Link>
-                            </div>
-                          ))}
+                                <Link
+                                  href={subItem.href}
+                                  className="flex items-center justify-between text-sm hover:text-primary"
+                                  onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                  {subItem.label}
+                                  <ChevronRight className="h-4 w-4" />
+                                </Link>
+                              </div>
+                            ))
+                          )}
                         </div>
                       </AccordionContent>
                     </AccordionItem>
@@ -256,7 +303,7 @@ const Nav = () => {
                     className="border-b border-gray-100 py-3"
                   >
                     <Link
-                      href={item.href}
+                      href={item.href ?? "/"}
                       className="flex items-center justify-between text-base font-medium hover:text-primary"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >

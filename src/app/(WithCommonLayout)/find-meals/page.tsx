@@ -24,6 +24,8 @@ import {
 import Image from "next/image";
 import SectionHeading from "@/components/shared/SectionHeading";
 import { getMeals } from "@/services/Meal";
+import { useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 
 const DIETARY_OPTIONS = [
   "Vegetarian",
@@ -56,12 +58,15 @@ const PROVIDER_OPTIONS = [
   "Family Table",
 ];
 
-const FindMeals: React.FC = () => {
+export default function FindMeals() {
   const [meals, setMeals] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [filteredMeals, setFilteredMeals] = useState<Array<any>>([]);
+  const searchParams = useSearchParams();
+  const diet = searchParams.get("diet");
+  const cuisine = searchParams.get("cuisine");
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,40 +86,93 @@ const FindMeals: React.FC = () => {
     });
   };
 
-  // Apply search and filters to meals
-  const applyFilters = (search: string, filters: string[]) => {
-    let results = meals;
+  // old: Apply search and filters to meals
+  // const applyFilters = (search: string, filters: string[]) => {
+  //   let results = meals;
 
-    // Apply search term (using "name" from backend)
-    if (search) {
-      const searchLower = search.toLowerCase();
-      results = results?.filter(
-        (meal) =>
-          meal.name.toLowerCase().includes(searchLower) ||
-          meal.description.toLowerCase().includes(searchLower) ||
-          meal.cuisine.toLowerCase().includes(searchLower) ||
-          meal.provider?.toLowerCase().includes(searchLower) ||
-          meal.dietaryInfo.some((tag: any) =>
-            tag.toLowerCase().includes(searchLower)
-          ) ||
-          meal.tags.some((tag: any) => tag.toLowerCase().includes(searchLower))
-      );
-    }
+  //   // Apply search term (using "name" from backend)
+  //   if (search) {
+  //     const searchLower = search.toLowerCase();
+  //     results = results?.filter(
+  //       (meal) =>
+  //         meal.name.toLowerCase().includes(searchLower) ||
+  //         meal.description.toLowerCase().includes(searchLower) ||
+  //         meal.cuisine.toLowerCase().includes(searchLower) ||
+  //         meal.provider?.toLowerCase().includes(searchLower) ||
+  //         meal.dietaryInfo.some((tag: any) =>
+  //           tag.toLowerCase().includes(searchLower)
+  //         ) ||
+  //         meal.tags.some((tag: any) => tag.toLowerCase().includes(searchLower))
+  //     );
+  //   }
 
-    // Apply filters
-    if (filters.length > 0) {
-      results = results?.filter((meal) =>
-        filters.some(
-          (filter) =>
-            meal.dietaryInfo.includes(filter) ||
-            meal.cuisine === filter ||
-            meal.provider === filter
-        )
-      );
-    }
+  //   // Apply filters
+  //   if (filters.length > 0) {
+  //     // old working one
+  //     // results = results?.filter((meal) =>
+  //     //   filters.some(
+  //     //     (filter) =>
+  //     //       meal.dietaryInfo.includes(filter) ||
+  //     //       meal.cuisine === filter ||
+  //     //       meal.provider === filter
+  //     //   )
+  //     // );
 
-    setFilteredMeals(results);
-  };
+  //     // New one
+  //     results = results?.filter((meal) =>
+  //       filters.some(
+  //         (filter) =>
+  //           meal.dietaryInfo?.some(
+  //             (tag: any) => tag.toLowerCase() === filter.toLowerCase()
+  //           ) ||
+  //           meal.cuisine?.toLowerCase() === filter.toLowerCase() ||
+  //           meal.provider?.toLowerCase() === filter.toLowerCase()
+  //       )
+  //     );
+  //   }
+
+  //   setFilteredMeals(results);
+  // };
+
+  // New: apply search and filter to meal
+  const applyFilters = useCallback(
+    (search: string, filters: string[]) => {
+      let results = meals;
+
+      if (search) {
+        const searchLower = search.toLowerCase();
+        results = results?.filter(
+          (meal) =>
+            meal.name.toLowerCase().includes(searchLower) ||
+            meal.description.toLowerCase().includes(searchLower) ||
+            meal.cuisine.toLowerCase().includes(searchLower) ||
+            meal.provider?.toLowerCase().includes(searchLower) ||
+            meal.dietaryInfo.some((tag: any) =>
+              tag.toLowerCase().includes(searchLower)
+            ) ||
+            meal.tags.some((tag: any) =>
+              tag.toLowerCase().includes(searchLower)
+            )
+        );
+      }
+
+      if (filters.length > 0) {
+        results = results?.filter((meal) =>
+          filters.some(
+            (filter) =>
+              meal.dietaryInfo?.some(
+                (tag: any) => tag.toLowerCase() === filter.toLowerCase()
+              ) ||
+              meal.cuisine?.toLowerCase() === filter.toLowerCase() ||
+              meal.provider?.toLowerCase() === filter.toLowerCase()
+          )
+        );
+      }
+
+      setFilteredMeals(results);
+    },
+    [meals]
+  );
 
   // Clear all filters
   const clearFilters = () => {
@@ -123,22 +181,85 @@ const FindMeals: React.FC = () => {
     setFilteredMeals(meals);
   };
 
+  // normalize quey value
+  const normalizeQueryValue = (query: string | null, options: string[]) => {
+    if (!query) return null;
+    const match = options.find(
+      (opt) => opt.toLowerCase() === query.toLowerCase()
+    );
+    return match || null;
+  };
+
+  // old one
+  // useEffect(() => {
+  //   const fetchMeals = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const response = await getMeals();
+  //       setMeals(response.data);
+  //       setFilteredMeals(response.data);
+
+  //       // apply query filter
+  //       const initialFilters = [];
+  //       const matchedDiet = normalizeQueryValue(diet, DIETARY_OPTIONS);
+  //       const matchedCuisine = normalizeQueryValue(cuisine, CUISINE_OPTIONS);
+
+  //       if (matchedDiet) initialFilters.push(matchedDiet);
+  //       if (matchedCuisine) initialFilters.push(matchedCuisine);
+  //       // console.log(initialFilters);
+
+  //       setActiveFilters(initialFilters);
+  //       applyFilters(searchTerm, initialFilters);
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.error("Error fetching meals:", error);
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchMeals();
+  // }, []);
+
+  // Fetch meals on mount
   useEffect(() => {
     const fetchMeals = async () => {
       setLoading(true);
       try {
         const response = await getMeals();
-        setMeals(response.data);
-        setFilteredMeals(response.data);
-        setLoading(false);
+        const allMeals = response.data;
+        setMeals(allMeals);
+
+        const matchedDiet = normalizeQueryValue(diet, DIETARY_OPTIONS);
+        const matchedCuisine = normalizeQueryValue(cuisine, CUISINE_OPTIONS);
+
+        const initialFilters = [];
+        if (matchedDiet) initialFilters.push(matchedDiet);
+        if (matchedCuisine) initialFilters.push(matchedCuisine);
+
+        setActiveFilters(initialFilters);
+        applyFilters(searchTerm, initialFilters);
       } catch (error) {
         console.error("Error fetching meals:", error);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchMeals();
-  }, []);
+  }, []); // ← only on first render
+
+  // 2. Apply filters whenever diet, cuisine, searchTerm, or meals change
+  useEffect(() => {
+    const matchedDiet = normalizeQueryValue(diet, DIETARY_OPTIONS);
+    const matchedCuisine = normalizeQueryValue(cuisine, CUISINE_OPTIONS);
+
+    const currentFilters: string[] = [];
+    if (matchedDiet) currentFilters.push(matchedDiet);
+    if (matchedCuisine) currentFilters.push(matchedCuisine);
+
+    setActiveFilters(currentFilters);
+    applyFilters(searchTerm, currentFilters);
+  }, [diet, cuisine, searchTerm, meals]);
 
   return (
     <div>
@@ -411,6 +532,4 @@ const FindMeals: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default FindMeals;
+}
