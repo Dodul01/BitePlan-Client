@@ -193,7 +193,7 @@ const Nav = () => {
                 {user.role === "customer" && (
                   <Link
                     className="cursor-pointer"
-                    href={"dashboard/customar/cart"}
+                    href={"/dashboard/customar/cart"}
                   >
                     <div className="relative inline-block">
                       <Button

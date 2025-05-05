@@ -11,6 +11,16 @@ import { useCart } from "@/context/UserContext";
 import Link from "next/link";
 import Loading from "@/components/shared/Loading";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { getCurrentUser } from "@/services/AuthServices";
 
 interface Meal {
   _id: string;
@@ -31,6 +41,11 @@ export default function MealDetailsPage() {
   const [meal, setMeal] = useState<Meal | null>(null);
   const [suggested, setSuggested] = useState<Meal[]>([]);
   const { setCart } = useCart();
+  const [user, setUser] = useState();
+  const [open, setOpen] = useState(false);
+  const [customization, setCustomization] = useState("");
+  const [schedule, setSchedule] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchMeal = async () => {
@@ -46,12 +61,57 @@ export default function MealDetailsPage() {
       setSuggested(randomSuggested);
     };
 
+    const fetchUser = async () => {
+      const user = await getCurrentUser();
+      if (user) setUser(user);
+    };
+
+    fetchUser();
+
     fetchMeal();
   }, [id]);
 
-  const addToCart = () => {
+  // const handleSubmit = () => {
+  //   if (!meal) return;
+  //   setIsSubmitting(true);
+  //   setCart((prev: any[]) => [
+  //     ...prev,
+  //     {
+  //       meal,
+  //       customization,
+  //       schedule,
+  //     },
+  //   ]);
+  //   setOpen(false);
+  //   setCustomization("");
+  //   setSchedule("");
+  //   toast.success("Meal added to cart");
+  //   setIsSubmitting(false);
+  // };
+
+  const handleSubmit = async () => {
     if (!meal) return;
-    setCart((prev: any) => [...prev, meal]);
+    setIsSubmitting(true);
+
+    try {
+      const newMeal = {
+        meal,
+        customization,
+        schedule,
+      };
+
+      if (user) {
+        setCart((prev: any) => [...prev, newMeal]);
+        toast.success("Order added to your cart");
+      } else {
+        toast.warning("Please sign in to order items.");
+      }
+
+      setCustomization("");
+      setSchedule("");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!meal) return <Loading />;
@@ -145,9 +205,44 @@ export default function MealDetailsPage() {
             <div className="text-2xl font-bold text-green-600 mb-2">
               ${meal.price.toFixed(2)}
             </div>
-            <Button className="w-full" onClick={addToCart}>
-              Add to Cart
-            </Button>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full">Add to Cart</Button>
+              </DialogTrigger>
+
+              <DialogContent className="max-w-md mx-auto p-4">
+                <DialogTitle>Customize Your Meal</DialogTitle>
+
+                <p className="text-sm text-muted-foreground">
+                  Add any custom instructions or choose a delivery time.
+                </p>
+                <p className="text-sm bg-[#FFC400] text-black rounded-lg text-center">
+                  *IF YOU DON&apos;T NEED TO CUSTOMIZE YOUR MEAL, CLICK ON
+                  COMPLETE ORDER*
+                </p>
+
+                <div className="space-y-4">
+                  <Textarea
+                    placeholder="Customization requests..."
+                    value={customization}
+                    onChange={(e) => setCustomization(e.target.value)}
+                  />
+                  <Input
+                    type="datetime-local"
+                    value={schedule}
+                    onChange={(e) => setSchedule(e.target.value)}
+                    min={new Date().toISOString().slice(0, 16)}
+                  />
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="w-full bg-green-600 text-white"
+                  >
+                    {isSubmitting ? "Adding..." : "Complete Order"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>

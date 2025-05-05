@@ -116,8 +116,8 @@ const OrderMealPage = () => {
   return (
     <div className="container mx-auto p-4 mt-20">
       <SectionHeading
-        title="Browse Our Menu"
-        subtitle="Order the food you like to arrive on you time."
+        title="Explore Our Meals"
+        subtitle="Choose your favorites and schedule delivery at your convenience."
       />
 
       <div className="mb-8 flex items-center justify-center w-full">

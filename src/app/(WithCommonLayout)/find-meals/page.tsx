@@ -267,7 +267,7 @@ export default function FindMeals() {
     <div>
       <div className="container mx-auto px-4 py-16 md:py-24">
         <SectionHeading
-          title="Find Your Perfect Meal"
+          title="Browse Your Perfect Meal"
           subtitle="Search and filter meals based on your preferences, dietary needs, and favorite cuisines"
           decorative={true}
         />
