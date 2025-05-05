@@ -10,6 +10,8 @@ import Testimonials from "@/components/shared/Testimonials";
 import { getUserFromDB } from "@/services/User";
 import Loading from "@/components/shared/Loading";
 import LimitedTimeOffer from "@/components/shared/LimitedTimeOffer";
+import FAQSection from "@/components/shared/FAQSection";
+import ImpactStats from "@/components/shared/ImpactStats";
 
 interface User {
   name: string;
@@ -55,10 +57,12 @@ export default function Home() {
         <div>
           <Banner />
           <HowItWorksSection />
+          <ImpactStats />
           <LimitedTimeOffer />
           <FeaturedMealsSection />
           <BenefitsSection />
           <Testimonials />
+          <FAQSection />
         </div>
       )}
     </div>

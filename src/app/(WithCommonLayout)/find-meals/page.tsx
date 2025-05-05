@@ -11,6 +11,7 @@ import {
   ChefHat,
   UsersRound,
   Clock3,
+  Star,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ import SectionHeading from "@/components/shared/SectionHeading";
 import { getMeals } from "@/services/Meal";
 import { useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import Link from "next/link";
 
 const DIETARY_OPTIONS = [
   "Vegetarian",
@@ -478,7 +480,9 @@ export default function FindMeals() {
 
                       {/* Description */}
                       <p className="text-sm text-gray-700 mb-3">
-                        {meal.description}
+                        {meal.description.length > 50
+                          ? `${meal.description.slice(0, 50)}...`
+                          : meal.description}
                       </p>
 
                       {/* Preparation Time and Servings */}
@@ -512,7 +516,44 @@ export default function FindMeals() {
                           </Badge>
                         ))}
                       </div>
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-2 py-2">
+                        <div className="flex">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-5 h-5 ${
+                                i < Math.round(meal.rating ?? 0)
+                                  ? "fill-yellow-500 text-yellow-500"
+                                  : "text-gray-300"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600">
+                          {typeof meal.rating === "number"
+                            ? meal.rating.toFixed(1)
+                            : "No"}{" "}
+                          rating
+                        </span>
+                      </div>
+
+                      {/* Price & CTA */}
+                      <div>
+                        <div className="text-2xl font-bold text-green-600">
+                          ${meal.price.toFixed(2)}
+                        </div>
+                      </div>
                     </div>
+                    <Link href={`/find-meals/${meal._id}`}>
+                      <Button
+                        variant="outline"
+                        className="mx-3 mb-3 w-[94%] cursor-pointer"
+                      >
+                        View Details
+                      </Button>
+                    </Link>
                   </div>
                 ))}
               </div>
