@@ -22,6 +22,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+} from "@/components/ui/pagination";
 import Image from "next/image";
 import SectionHeading from "@/components/shared/SectionHeading";
 import { getMeals } from "@/services/Meal";
@@ -66,9 +75,18 @@ export default function FindMeals() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [filteredMeals, setFilteredMeals] = useState<Array<any>>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const searchParams = useSearchParams();
   const diet = searchParams.get("diet");
   const cuisine = searchParams.get("cuisine");
+
+  // paginated meals
+  const paginatedMeals = filteredMeals.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,57 +106,10 @@ export default function FindMeals() {
     });
   };
 
-  // old: Apply search and filters to meals
-  // const applyFilters = (search: string, filters: string[]) => {
-  //   let results = meals;
-
-  //   // Apply search term (using "name" from backend)
-  //   if (search) {
-  //     const searchLower = search.toLowerCase();
-  //     results = results?.filter(
-  //       (meal) =>
-  //         meal.name.toLowerCase().includes(searchLower) ||
-  //         meal.description.toLowerCase().includes(searchLower) ||
-  //         meal.cuisine.toLowerCase().includes(searchLower) ||
-  //         meal.provider?.toLowerCase().includes(searchLower) ||
-  //         meal.dietaryInfo.some((tag: any) =>
-  //           tag.toLowerCase().includes(searchLower)
-  //         ) ||
-  //         meal.tags.some((tag: any) => tag.toLowerCase().includes(searchLower))
-  //     );
-  //   }
-
-  //   // Apply filters
-  //   if (filters.length > 0) {
-  //     // old working one
-  //     // results = results?.filter((meal) =>
-  //     //   filters.some(
-  //     //     (filter) =>
-  //     //       meal.dietaryInfo.includes(filter) ||
-  //     //       meal.cuisine === filter ||
-  //     //       meal.provider === filter
-  //     //   )
-  //     // );
-
-  //     // New one
-  //     results = results?.filter((meal) =>
-  //       filters.some(
-  //         (filter) =>
-  //           meal.dietaryInfo?.some(
-  //             (tag: any) => tag.toLowerCase() === filter.toLowerCase()
-  //           ) ||
-  //           meal.cuisine?.toLowerCase() === filter.toLowerCase() ||
-  //           meal.provider?.toLowerCase() === filter.toLowerCase()
-  //       )
-  //     );
-  //   }
-
-  //   setFilteredMeals(results);
-  // };
-
   // New: apply search and filter to meal
   const applyFilters = useCallback(
     (search: string, filters: string[]) => {
+      setCurrentPage(1);
       let results = meals;
 
       if (search) {
@@ -191,36 +162,6 @@ export default function FindMeals() {
     );
     return match || null;
   };
-
-  // old one
-  // useEffect(() => {
-  //   const fetchMeals = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const response = await getMeals();
-  //       setMeals(response.data);
-  //       setFilteredMeals(response.data);
-
-  //       // apply query filter
-  //       const initialFilters = [];
-  //       const matchedDiet = normalizeQueryValue(diet, DIETARY_OPTIONS);
-  //       const matchedCuisine = normalizeQueryValue(cuisine, CUISINE_OPTIONS);
-
-  //       if (matchedDiet) initialFilters.push(matchedDiet);
-  //       if (matchedCuisine) initialFilters.push(matchedCuisine);
-  //       // console.log(initialFilters);
-
-  //       setActiveFilters(initialFilters);
-  //       applyFilters(searchTerm, initialFilters);
-  //       setLoading(false);
-  //     } catch (error) {
-  //       console.error("Error fetching meals:", error);
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchMeals();
-  // }, []);
 
   // Fetch meals on mount
   useEffect(() => {
@@ -448,115 +389,167 @@ export default function FindMeals() {
           )}
         </div>
 
-        {/* Meals container*/}
+        {/* New Meals Container */}
         <div className="max-w-6xl mx-auto mb-8">
-          {/*TODO: Need to add a loading spinner here  */}
           <div className="mt-6">
             {loading === true || filteredMeals?.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredMeals.map((meal) => (
-                  <div
-                    key={meal._id}
-                    className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 bg-white"
-                  >
-                    <Image
-                      height={400}
-                      width={400}
-                      src={meal.image}
-                      alt={meal.name}
-                      className="w-full h-48 object-cover"
-                    />
+              <>
+                {/* Meals */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                  {paginatedMeals.map((meal) => (
+                    <div
+                      key={meal._id}
+                      className="flex flex-col border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 bg-white"
+                    >
+                      <Image
+                        height={300}
+                        width={400}
+                        src={meal.image}
+                        alt={meal.name}
+                        className="w-full h-40 object-cover"
+                      />
 
-                    <div className="p-4">
-                      {/* Title */}
-                      <h3 className="text-2xl font-semibold text-gray-800 mb-2">
-                        {meal.name}
-                      </h3>
+                      <div className="p-4 flex flex-col flex-grow">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                          {meal.name}
+                        </h3>
 
-                      {/* Provider Info */}
-                      <p className="text-sm text-gray-500 mb-2">
-                        Provider: {meal.busisnessName}
-                      </p>
+                        <p className="text-xs text-gray-500 mb-1">
+                          Provider: {meal.busisnessName}
+                        </p>
 
-                      {/* Description */}
-                      <p className="text-sm text-gray-700 mb-3">
-                        {meal.description.length > 50
-                          ? `${meal.description.slice(0, 50)}...`
-                          : meal.description}
-                      </p>
+                        <p className="text-sm text-gray-700 line-clamp-1 mb-2">
+                          {meal.description}
+                        </p>
 
-                      {/* Preparation Time and Servings */}
-                      <div className="flex items-center justify-between text-gray-600 text-sm mb-3">
-                        <div className="flex items-center gap-2">
-                          <Clock3 /> {meal.prepTime}
+                        <div className="flex items-center justify-between text-gray-600 text-xs mb-2">
+                          <div className="flex items-center gap-1">
+                            <Clock3 className="w-4 h-4" />
+                            {meal.prepTime}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <UsersRound className="w-4 h-4" />
+                            {meal.servings}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <UsersRound />
-                          <span className="font-medium">{meal.servings}</span>
-                        </div>
-                      </div>
 
-                      {/* Dietary Info Tags */}
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {meal?.dietaryInfo?.map((tag: any, index: number) => (
-                          <span
-                            key={index}
-                            className="text-sm px-2 py-1 rounded-full bg-green-100 text-green-700"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* General Tags */}
-                      <div className="flex flex-wrap gap-2">
-                        {meal.tags.map((tag: any, index: number) => (
-                          <Badge variant="outline" key={index}>
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {/* Rating */}
-                      <div className="flex items-center gap-2 py-2">
-                        <div className="flex">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-5 h-5 ${
-                                i < Math.round(meal.rating ?? 0)
-                                  ? "fill-yellow-500 text-yellow-500"
-                                  : "text-gray-300"
-                              }`}
-                            />
+                        <div className="flex flex-wrap gap-1 text-xs text-green-700 mb-2">
+                          {meal?.dietaryInfo?.map((tag: any, idx: number) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-0.5 bg-green-100 rounded-full"
+                            >
+                              {tag}
+                            </span>
                           ))}
                         </div>
-                        <span className="text-sm text-gray-600">
-                          {typeof meal.rating === "number"
-                            ? meal.rating.toFixed(1)
-                            : "No"}{" "}
-                          rating
-                        </span>
-                      </div>
 
-                      {/* Price & CTA */}
-                      <div>
-                        <div className="text-2xl font-bold text-green-600">
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {meal.tags.map((tag: any, idx: number) => (
+                            <Badge
+                              variant="outline"
+                              key={idx}
+                              className="text-xs"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="flex">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < Math.round(meal.rating ?? 0)
+                                    ? "fill-yellow-500 text-yellow-500"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-xs text-gray-600">
+                            {typeof meal.rating === "number"
+                              ? meal.rating.toFixed(1)
+                              : "No"}{" "}
+                            rating
+                          </span>
+                        </div>
+
+                        <div className="text-green-600 font-bold text-lg mb-3">
                           ${meal.price.toFixed(2)}
                         </div>
+
+                        <Link
+                          href={`/find-meals/${meal._id}`}
+                          className="mt-auto"
+                        >
+                          <Button variant="outline" className="w-full">
+                            View Details
+                          </Button>
+                        </Link>
                       </div>
                     </div>
-                    <Link href={`/find-meals/${meal._id}`}>
-                      <Button
-                        variant="outline"
-                        className="mx-3 mb-3 w-[94%] cursor-pointer"
-                      >
-                        View Details
-                      </Button>
-                    </Link>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+
+                {/* paginations */}
+                {filteredMeals.length > itemsPerPage && (
+                  <Pagination className="mt-8 justify-center">
+                    <PaginationContent>
+                      {/* Previous */}
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
+                          className={
+                            currentPage === 1
+                              ? "pointer-events-none cursor-pointer opacity-50"
+                              : "cursor-pointer"
+                          }
+                        />
+                      </PaginationItem>
+
+                      {/* Pages */}
+                      {Array.from({
+                        length: Math.ceil(filteredMeals.length / itemsPerPage),
+                      }).map((_, idx) => (
+                        <PaginationItem key={idx}>
+                          <PaginationLink
+                            className="cursor-pointer"
+                            isActive={currentPage === idx + 1}
+                            onClick={() => setCurrentPage(idx + 1)}
+                          >
+                            {idx + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+
+                      {/* Next */}
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(
+                                prev + 1,
+                                Math.ceil(filteredMeals.length / itemsPerPage)
+                              )
+                            )
+                          }
+                          className={
+                            currentPage ===
+                            Math.ceil(filteredMeals.length / itemsPerPage)
+                              ? "pointer-events-none opacity-50 cursor-pointer"
+                              : "cursor-pointer"
+                          }
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                )}
+              </>
             ) : (
               <div className="text-center py-12">
                 <h3 className="text-lg font-medium mb-2">
