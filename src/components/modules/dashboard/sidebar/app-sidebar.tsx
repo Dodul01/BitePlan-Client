@@ -25,10 +25,12 @@ import {
 
 import Link from "next/link";
 import { NavMain } from "./nav-main";
-import { NavUser } from "./nav-user";
+// import { NavUser } from "./nav-user";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getCurrentUser } from "@/services/AuthServices";
+import { getCurrentUser, logout } from "@/services/AuthServices";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/context/UserContext";
 
 const data = {
   customarMenu: [
@@ -103,6 +105,13 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [role, setRole] = useState("");
 
+  const { setCart } = useCart();
+
+  const handleLogout = () => {
+    setCart([]);
+    logout();
+  };
+
   const getUser = async () => {
     const user = await getCurrentUser();
     setRole(user?.role);
@@ -144,7 +153,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       )}
       <SidebarFooter>
-        <NavUser />
+        <Button onClick={handleLogout} className="cursor-pointer">
+          Sign Out
+        </Button>
       </SidebarFooter>
     </Sidebar>
   );

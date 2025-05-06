@@ -9,6 +9,17 @@ import { getCurrentUser, signInUser } from "@/services/AuthServices";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
+const credentials = {
+  customer: {
+    email: "mozammelhoquedodul@gmail.com",
+    password: "12345678",
+  },
+  mealProvider: {
+    email: "forkneasy@gmail.com",
+    password: "12345678",
+  },
+};
+
 const SignIn = () => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +37,6 @@ const SignIn = () => {
     try {
       const res = await signInUser(userData);
       const user = await getCurrentUser();
-
 
       if (res?.success) {
         setIsLoading(false);
@@ -47,14 +57,42 @@ const SignIn = () => {
     }
   };
 
+  const handleCustomarCredential = () => {
+    setIdentifier(credentials.customer.email);
+    setPassword(credentials.customer.password);
+  };
+
+  const handleProviderCredential = () => {
+    setIdentifier(credentials.mealProvider.email);
+    setPassword(credentials.mealProvider.password);
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold">Welcome back</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Sign in to your account to continue
+            Sign in to your account to continue <br />
+            click one of the buttons below to autofill test credentials.
           </p>
+
+          <div className="flex items-center justify-center gap-3 mt-3">
+            <Button
+              variant={"outline"}
+              className="cursor-pointer"
+              onClick={handleCustomarCredential}
+            >
+              Customer Credential
+            </Button>
+            <Button
+              variant={"outline"}
+              className="cursor-pointer"
+              onClick={handleProviderCredential}
+            >
+              Provider Credential
+            </Button>
+          </div>
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
