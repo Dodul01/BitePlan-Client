@@ -76,10 +76,10 @@ const navItems: NavItem[] = [
     label: "Order Meal",
     href: "/order-meal",
   },
-  {
-    label: "Vendors",
-    href: "/vendors",
-  },
+  // {
+  //   label: "Vendors",
+  //   href: "/vendors",
+  // },
   { label: "How It Works", href: "/how-it-works" },
   { label: "About Us", href: "/about" },
 ];

@@ -46,6 +46,15 @@ const OrderMealPage = () => {
   const { setCart } = useCart();
   const [user, setUser] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const totalPages = Math.ceil(filteredMeals.length / itemsPerPage);
+  const paginatedMeals = filteredMeals.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   const handleSubmit = async () => {
     if (!selectedMeal) return;
     setIsSubmitting(true);
@@ -130,88 +139,86 @@ const OrderMealPage = () => {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(6)]?.map((_, i) => (
             <Skeleton key={i} className="h-64 rounded-lg" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMeals?.map((meal, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+          {paginatedMeals?.map((meal: any, index) => (
             <Dialog key={index}>
               <DialogTrigger asChild>
                 <div>
                   <DialogTitle></DialogTitle>
                   {/* card */}
                   <Card
-                    className="cursor-pointer transition-all hover:shadow-lg"
+                    className="group cursor-pointer rounded-xl border hover:shadow-lg transition-all flex flex-col h-full"
                     onClick={() => setSelectedMeal(meal)}
                   >
-                    <CardContent>
-                      <Image
-                        src={meal.image}
-                        alt={meal.name}
-                        className="h-48 w-full object-cover rounded-md"
-                        height={500}
-                        width={500}
-                      />
+                    <CardContent className="p-4 flex flex-col flex-grow">
+                      {/* Image */}
+                      <div className="relative w-full h-40 overflow-hidden rounded-lg">
+                        <Image
+                          src={meal.image}
+                          alt={meal.name}
+                          className="object-cover w-full h-full"
+                          width={500}
+                          height={500}
+                        />
+                      </div>
 
-                      {/* Meal Name & Provider */}
-                      <div className="mt-4">
-                        <h1 className="font-bold text-lg">{meal.name}</h1>
+                      {/* Meal Title & Provider */}
+                      <div className="mt-3 space-y-1">
+                        <h2 className="text-lg font-semibold text-gray-900">
+                          {meal.name}
+                        </h2>
                         {meal.busisnessName && (
-                          <p className="text-sm text-gray-500 mt-1">
-                            Provider: {meal.busisnessName}
+                          <p className="text-xs text-gray-500">
+                            By {meal.busisnessName}
                           </p>
                         )}
                       </div>
 
-                      {/* Meal Description */}
-                      <p className="mt-2 text-gray-600 text-sm">
+                      {/* Description */}
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                         {meal.description}
                       </p>
 
-                      {/* Preparation Time and Servings */}
-                      {(meal.prepTime || meal.servings) && (
-                        <div className="mt-4 flex justify-between items-center text-gray-600 text-sm">
-                          {meal.prepTime && (
-                            <span className="flex items-center gap-1">
-                              <Clock3 /> {meal.prepTime}
-                            </span>
-                          )}
-                          {meal.servings && (
-                            <div className="flex items-center gap-1">
-                              <UsersRound />
-                              <span className="font-semibold">
-                                {meal.servings}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      {/* Meta info: prep + servings */}
+                      <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+                        {meal.prepTime && (
+                          <span className="flex items-center gap-1">
+                            <Clock3 className="w-4 h-4" /> {meal.prepTime}
+                          </span>
+                        )}
+                        {meal.servings && (
+                          <span className="flex items-center gap-1">
+                            <UsersRound className="w-4 h-4" /> {meal.servings}
+                          </span>
+                        )}
+                      </div>
 
-                      {/* Dietary Information Tags */}
-                      {meal?.dietaryInfo?.length > 0 && (
-                        <div className="mt-3 flex gap-2 flex-wrap">
-                          {meal.dietaryInfo.map((tag, index) => (
-                            <span
-                              key={index}
-                              className="text-xs px-2 py-1 rounded-full"
-                              style={{
-                                backgroundColor: "#44C35622",
-                                color: "#44C356",
-                              }}
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Additional Tags (if any) */}
-                      {meal.tags && meal.tags.length > 0 && (
+                      {/* Dietary tags */}
+                      {meal.dietaryInfo?.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-2">
-                          {meal.tags.map((tag, index) => (
+                          {meal.dietaryInfo.map(
+                            (tag: string, index: number) => (
+                              <span
+                                key={index}
+                                className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-600"
+                              >
+                                {tag}
+                              </span>
+                            )
+                          )}
+                        </div>
+                      )}
+
+                      {/* Additional tags */}
+                      {meal.tags?.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {meal.tags.map((tag: string, index: number) => (
                             <Badge key={index} variant="outline">
                               {tag}
                             </Badge>
@@ -219,14 +226,18 @@ const OrderMealPage = () => {
                         </div>
                       )}
 
-                      <p className="font-bold text-[#44C356] mt-3">
-                        {" "}
+                      {/* Spacer */}
+                      <div className="flex-grow" />
+
+                      {/* Price */}
+                      <p className="text-sm font-bold text-[#44C356] mt-4">
                         ${meal?.price?.toFixed(2)}
                       </p>
                     </CardContent>
 
-                    <CardFooter>
-                      <Button className="mt-5 w-full cursor-pointer transition-all ease-in-out duration-300 hover:outline-2 hover:outline-[#44C356] hover:text-[#44C356] hover:bg-white rounded-full">
+                    {/* CTA Button */}
+                    <CardFooter className="px-4 pb-4">
+                      <Button className="w-full rounded-full bg-[#44C356] text-white hover:bg-white hover:text-[#44C356] hover:border-[#44C356] transition">
                         Order Now
                       </Button>
                     </CardFooter>
@@ -318,6 +329,37 @@ const OrderMealPage = () => {
           ))}
         </div>
       )}
+
+      <div className="flex justify-center mt-6 gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((prev) => prev - 1)}
+        >
+          Previous
+        </Button>
+
+        {Array.from({ length: totalPages }).map((_, idx) => (
+          <Button
+            key={idx}
+            variant={currentPage === idx + 1 ? "default" : "outline"}
+            size="sm"
+            onClick={() => setCurrentPage(idx + 1)}
+          >
+            {idx + 1}
+          </Button>
+        ))}
+
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 };
